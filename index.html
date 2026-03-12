@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="séche.">
+<meta name="apple-mobile-web-app-title" content="Sèche.">
 <meta name="theme-color" content="#0f0f0f">
-<title>séche.</title>
+<title>Sèche.</title>
 <link rel="manifest" href="manifest.json">
 <!-- Icône Apple Touch (inline SVG → base64) -->
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF0mlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuZjM1NGVmYywgMjAyMy8xMS8wOS0xMjowNTo1MyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjMgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZHVtbXkiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6ZHVtbXkiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpkdW1teSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpkdW1teSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXGBZWcAAAMtSURBVHja7NoxAQAAAMKg9U9tDQ8gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgDQAIAAEAs3cR4QAAAABJRU5ErkJggg==">
@@ -146,7 +147,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 <div id="app">
   <div id="hdr">
     <div id="hdr-top">
-      <span class="brand">séche.</span>
+      <span class="brand">Sèche.</span>
       <div id="date-row">
         <button class="ibtn" id="btn-prev">‹</button>
         <span id="date-lbl"></span>
@@ -238,220 +239,175 @@ const ACC="#c8f060",RED="#ff5252",ORA="#ffab40",BLU="#60b8f0",PUR="#b06af0",MUT=
 
 // ═══════════════════ STATE ═══════════════════
 const r2=n=>Math.round(n*100)/100;
-const todayStr=()=>new Date().toISOString().split("T")[0];
-const fmtDate=s=>new Date(s+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+const todayStr=()=>new Date().toISOString().split(“T”)[0];
+const fmtDate=s=>new Date(s+“T12:00:00”).toLocaleDateString(“fr-FR”,{weekday:“long”,day:“numeric”,month:“long”});
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 
 let S={
-  tab:"journal", date:todayStr(),
-  journal:lsGet("sj",{}),
-  profil:lsGet("sp",{poids:72.5,taille:178,age:27,sexe:"homme",tg:0.13,activite:2,deficit:17,coefP:2.5,coefL:0.8}),
-  dbUser:lsGet("sdb",[]),
-  search:"",ddOpen:false,selAl:null,qtt:"100",meal:"Déjeuner",addMode:"bdd",
-  manual:{nom:"",prot:"",glu:"",lip:"",kcal:"",qtt:"100"},
-  bddSearch:"",bddForm:false,
-  newAl:{nom:"",ref:"100g",prot:"",glu:"",lip:"",kcal:""},
+tab:“journal”, date:todayStr(),
+journal:lsGet(“sj”,{}),
+profil:lsGet(“sp”,{poids:72.5,taille:178,age:27,sexe:“homme”,tg:0.13,activite:2,deficit:17,coefP:2.5,coefL:0.8}),
+dbUser:lsGet(“sdb”,[]),
+search:””,ddOpen:false,selAl:null,qtt:“100”,meal:“Déjeuner”,addMode:“bdd”,
+manual:{nom:””,prot:””,glu:””,lip:””,kcal:””,qtt:“100”},
+bddSearch:””,bddForm:false,
+newAl:{nom:””,ref:“100g”,prot:””,glu:””,lip:””,kcal:””},
 };
 let _ddFiltered=[];
 
-function save(){lsSet("sj",S.journal);lsSet("sp",S.profil);lsSet("sdb",S.dbUser);}
-function allDB(){return [...DB_BASE,...S.dbUser.map(a=>({...a,_user:true}))];}
+function save(){lsSet(“sj”,S.journal);lsSet(“sp”,S.profil);lsSet(“sdb”,S.dbUser);}
+function allDB(){return […DB_BASE,…S.dbUser.map(a=>({…a,_user:true}))];}
 function calcTdee(p){
-  const mm=r2(p.poids*(1-p.tg));
-  const mbr=p.tg>0?r2(370+21.6*mm):r2(p.sexe==="homme"?10*p.poids+6.25*p.taille-5*p.age+5:10*p.poids+6.25*p.taille-5*p.age-161);
-  const tdee=r2(mbr*(ACTIVITY[p.activite]?.f||1.55));
-  const obj=r2(tdee*(1-p.deficit/100));
-  const protG=r2(p.coefP*mm),lipG=r2(p.coefL*mm);
-  const gluG=Math.max(0,r2((obj-protG*4-lipG*9)/4));
-  return{mm,mbr,tdee,obj,protG,lipG,gluG};
+const mm=r2(p.poids*(1-p.tg));
+const mbr=p.tg>0?r2(370+21.6*mm):r2(p.sexe===“homme”?10*p.poids+6.25*p.taille-5*p.age+5:10*p.poids+6.25*p.taille-5*p.age-161);
+const tdee=r2(mbr*(ACTIVITY[p.activite]?.f||1.55));
+const obj=r2(tdee*(1-p.deficit/100));
+const protG=r2(p.coefP*mm),lipG=r2(p.coefL*mm);
+const gluG=Math.max(0,r2((obj-protG*4-lipG*9)/4));
+return{mm,mbr,tdee,obj,protG,lipG,gluG};
 }
 
 // ═══════════════════ RENDER ═══════════════════
 function render(){
-  // Tabs
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===S.tab));
-  document.getElementById("date-lbl").textContent=fmtDate(S.date);
-  document.getElementById("btn-next").disabled=S.date>=todayStr();
-  // Content
-  const c=document.getElementById("content");
-  if(S.tab==="journal") c.innerHTML=renderJournal();
-  else if(S.tab==="profil") c.innerHTML=renderProfil();
-  else c.innerHTML=renderBDD();
+// Tabs
+document.querySelectorAll(”.tab-btn”).forEach(b=>b.classList.toggle(“active”,b.dataset.tab===S.tab));
+document.getElementById(“date-lbl”).textContent=fmtDate(S.date);
+
+// Content
+const c=document.getElementById(“content”);
+if(S.tab===“journal”) c.innerHTML=renderJournal();
+else if(S.tab===“profil”) c.innerHTML=renderProfil();
+else c.innerHTML=renderBDD();
 }
 
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function esc(s){return String(s).replace(/&/g,”&”).replace(/</g,”<”).replace(/>/g,”>”).replace(/”/g,”"”);}
 function irow(label,val,color,note){
-  return`<div class="irow"><div><div class="irow-lbl">${esc(label)}</div>${note?`<div class="irow-note">${esc(note)}</div>`:""}</div><span class="irow-val" style="color:${color||"#f0ede8"}">${esc(val)}</span></div>`;}
+return`<div class="irow"><div><div class="irow-lbl">${esc(label)}</div>${note?`<div class="irow-note">${esc(note)}</div>`:""}</div><span class="irow-val" style="color:${color||"#f0ede8"}">${esc(val)}</span></div>`;}
 function stepB(n,l){return`<div class="step-badge"><div class="step-n">${n}</div><span class="step-lbl">${esc(l)}</span><div class="step-line"></div></div>`;}
 function sec(l){return`<div class="sec"><span class="sec-lbl">${esc(l)}</span><div class="sec-line"></div></div>`;}
 
 // ═══════════════════ JOURNAL ═══════════════════
 function renderJournal(){
-  const C=calcTdee(S.profil);
-  const items=S.journal[S.date]||[];
-  const tot=items.reduce((a,i)=>({kcal:a.kcal+i.kcal,prot:a.prot+i.prot,glu:a.glu+i.glu,lip:a.lip+i.lip}),{kcal:0,prot:0,glu:0,lip:0});
-  const pct=Math.min(tot.kcal/C.obj*100,100);
-  const isOver=tot.kcal>C.obj,isWarn=pct>85&&!isOver;
-  const barC=isOver?RED:isWarn?ORA:ACC;
-  const rest=isOver?`+${Math.round(tot.kcal-C.obj)}`:Math.round(C.obj-tot.kcal);
+const C=calcTdee(S.profil);
+const items=S.journal[S.date]||[];
+const tot=items.reduce((a,i)=>({kcal:a.kcal+i.kcal,prot:a.prot+i.prot,glu:a.glu+i.glu,lip:a.lip+i.lip}),{kcal:0,prot:0,glu:0,lip:0});
+const pct=Math.min(tot.kcal/C.obj*100,100);
+const isOver=tot.kcal>C.obj,isWarn=pct>85&&!isOver;
+const barC=isOver?RED:isWarn?ORA:ACC;
+const rest=isOver?`+${Math.round(tot.kcal-C.obj)}`:Math.round(C.obj-tot.kcal);
 
-  let html=`<div class="j-left">`;
+let html=`<div class="j-left">`;
 
-  // Bilan
-  html+=`<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div><span class="big-num" style="color:${barC}">${Math.round(tot.kcal)}</span><span style="font-size:.75rem;color:${MUT};margin-left:6px">/ ${C.obj} kcal</span></div>
-      <div style="text-align:right"><div style="font-size:.6rem;color:${MUT};font-family:monospace;text-transform:uppercase;margin-bottom:2px">Restant</div>
-      <div style="font-size:1.2rem;font-weight:700;color:${isOver?RED:ACC}">${rest} kcal</div></div>
-    </div>
-    <div style="height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:12px">
-      <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px"></div></div>
-    <div class="macro-grid">`;
-  [{l:"Protéines",v:tot.prot,t:C.protG,c:BLU},{l:"Glucides",v:tot.glu,t:C.gluG,c:ORA},{l:"Lipides",v:tot.lip,t:C.lipG,c:PUR}].forEach(m=>{
-    html+=`<div class="mbox"><div class="mbox-lbl">${m.l}</div><div class="mbox-val" style="color:${m.c}">${r2(m.v)}g</div><div class="mbox-sub">/ ${m.t}g</div>
-    <div class="pbar"><div class="pbar-f" style="width:${Math.min(m.v/m.t*100,100)}%;background:${m.c}"></div></div></div>`;
-  });
-  html+=`</div></div>`;
+// Bilan
+html+=`<div class="card"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"> <div><span class="big-num" style="color:${barC}">${Math.round(tot.kcal)}</span><span style="font-size:.75rem;color:${MUT};margin-left:6px">/ ${C.obj} kcal</span></div> <div style="text-align:right"><div style="font-size:.6rem;color:${MUT};font-family:monospace;text-transform:uppercase;margin-bottom:2px">Restant</div> <div style="font-size:1.2rem;font-weight:700;color:${isOver?RED:ACC}">${rest} kcal</div></div> </div> <div style="height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:12px"> <div style="height:100%;width:${pct}%;background:${barC};border-radius:3px"></div></div> <div class="macro-grid">`;
+[{l:“Protéines”,v:tot.prot,t:C.protG,c:BLU},{l:“Glucides”,v:tot.glu,t:C.gluG,c:ORA},{l:“Lipides”,v:tot.lip,t:C.lipG,c:PUR}].forEach(m=>{
+html+=`<div class="mbox"><div class="mbox-lbl">${m.l}</div><div class="mbox-val" style="color:${m.c}">${r2(m.v)}g</div><div class="mbox-sub">/ ${m.t}g</div> <div class="pbar"><div class="pbar-f" style="width:${Math.min(m.v/m.t*100,100)}%;background:${m.c}"></div></div></div>`;
+});
+html+=`</div></div>`;
 
-  // Formulaire ajout
-  html+=sec("Ajouter un aliment")+`<div class="card">
-    <div class="msw">
-      <button class="mbtn${S.addMode==="bdd"?" active":""}" data-action="mode-bdd">Base de données</button>
-      <button class="mbtn${S.addMode==="manuel"?" active":""}" data-action="mode-manuel">Saisie manuelle</button>
-    </div>`;
+// Formulaire ajout
+html+=sec(“Ajouter un aliment”)+`<div class="card"> <div class="msw"> <button class="mbtn${S.addMode==="bdd"?" active":""}" data-action="mode-bdd">Base de données</button> <button class="mbtn${S.addMode==="manuel"?" active":""}" data-action="mode-manuel">Saisie manuelle</button> </div>`;
 
-  if(S.addMode==="bdd"){
-    const q=parseFloat(S.qtt)||0,ratio=q/100;
-    _ddFiltered=allDB().filter(a=>a.nom.toLowerCase().includes(S.search.toLowerCase())).slice(0,12);
-    html+=`<div class="dd"><div style="position:relative">
-      <input type="text" id="inp-search" value="${esc(S.search)}" placeholder="Rechercher un aliment…" autocomplete="off">
-      ${S.selAl?`<button data-action="clear-sel" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:${MUT};font-size:1.1rem;cursor:pointer;line-height:1;min-width:30px;min-height:30px">✕</button>`:""}
-    </div>`;
-    if(S.ddOpen&&!S.selAl){
-      html+=`<div class="dd-list">`;
-      if(!_ddFiltered.length) html+=`<div style="padding:12px 14px;font-size:.82rem;color:${MUT}">Aucun résultat</div>`;
-      else _ddFiltered.forEach((a,i)=>{
-        html+=`<div class="dd-item" data-action="pick-al" data-idx="${i}">
-          <span class="dd-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</span>
-          <div class="dd-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal}</span></div>
-        </div>`;
-      });
-      html+=`</div>`;
-    }
-    html+=`</div>`;
-    if(S.selAl){
-      const a=S.selAl;
-      html+=`<div class="prev-ref"><div class="prev-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div>
-        <div class="prev-lbl">Valeurs pour ${esc(a.ref)} (référence)</div>
-        <div class="prev-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal} kcal</span></div>
-      </div>
-      <div class="g2" style="margin-bottom:10px">
-        <div class="field"><label>Quantité (g / ml)</label><input type="number" id="inp-qtt" value="${esc(S.qtt)}" min="0" step="5" style="font-size:1.05rem;font-weight:700"></div>
-        <div class="field"><label>Repas</label><select id="sel-meal">${MEALS.map(m=>`<option${m===S.meal?" selected":""}>${esc(m)}</option>`).join("")}</select></div>
-      </div>`;
-      if(q>0) html+=`<div class="prev-calc">
-        <div class="prev-mac2"><span style="color:${BLU}">P <strong>${r2(a.prot*ratio)}g</strong></span><span style="color:${ORA}">G <strong>${r2(a.glu*ratio)}g</strong></span><span style="color:${PUR}">L <strong>${r2(a.lip*ratio)}g</strong></span></div>
-        <span class="prev-kcal">${Math.round(a.kcal*ratio)} kcal</span></div>`;
-    }
-  } else {
-    const M=S.manual;
-    html+=`<div class="g2">
-      <div class="field span2"><label>Nom</label><input type="text" id="m-nom" value="${esc(M.nom)}" placeholder="ex. Salade niçoise"></div>
-      <div class="field"><label>Quantité (g)</label><input type="number" id="m-qtt" value="${esc(M.qtt)}"></div>
-      <div class="field"><label>Calories (kcal)</label><input type="number" id="m-kcal" value="${esc(M.kcal)}"></div>
-      <div class="field"><label>Protéines (g)</label><input type="number" id="m-prot" value="${esc(M.prot)}"></div>
-      <div class="field"><label>Glucides (g)</label><input type="number" id="m-glu" value="${esc(M.glu)}"></div>
-      <div class="field"><label>Lipides (g)</label><input type="number" id="m-lip" value="${esc(M.lip)}"></div>
-      <div class="field"><label>Repas</label><select id="sel-meal">${MEALS.map(m=>`<option${m===S.meal?" selected":""}>${esc(m)}</option>`).join("")}</select></div>
-    </div>`;
-  }
-  html+=`<button class="add-btn" data-action="add-item">+ Ajouter</button></div>`;
+if(S.addMode===“bdd”){
+const q=parseFloat(S.qtt)||0,ratio=q/100;
+_ddFiltered=allDB().filter(a=>a.nom.toLowerCase().includes(S.search.toLowerCase())).slice(0,12);
+html+=`<div class="dd"><div style="position:relative"> <input type="text" id="inp-search" value="${esc(S.search)}" placeholder="Rechercher un aliment…" autocomplete="off"> ${S.selAl?`<button data-action="clear-sel" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:${MUT};font-size:1.1rem;cursor:pointer;line-height:1;min-width:30px;min-height:30px">✕</button>`:""} </div>`;
+if(S.ddOpen&&!S.selAl){
+html+=`<div class="dd-list">`;
+if(!_ddFiltered.length) html+=`<div style="padding:12px 14px;font-size:.82rem;color:${MUT}">Aucun résultat</div>`;
+else _ddFiltered.forEach((a,i)=>{
+html+=`<div class="dd-item" data-action="pick-al" data-idx="${i}"> <span class="dd-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</span> <div class="dd-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal}</span></div> </div>`;
+});
+html+=`</div>`;
+}
+html+=`</div>`;
+if(S.selAl){
+const a=S.selAl;
+html+=`<div class="prev-ref"><div class="prev-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div> <div class="prev-lbl">Valeurs pour ${esc(a.ref)} (référence)</div> <div class="prev-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal} kcal</span></div> </div> <div class="g2" style="margin-bottom:10px"> <div class="field"><label>Quantité (g / ml)</label><input type="number" id="inp-qtt" value="${esc(S.qtt)}" min="0" step="5" style="font-size:1.05rem;font-weight:700"></div> <div class="field"><label>Repas</label><select id="sel-meal">${MEALS.map(m=>`<option${m===S.meal?” selected”:””}>${esc(m)}</option>`).join("")}</select></div> </div>`;
+if(q>0) html+=`<div class="prev-calc"> <div class="prev-mac2"><span style="color:${BLU}">P <strong>${r2(a.prot*ratio)}g</strong></span><span style="color:${ORA}">G <strong>${r2(a.glu*ratio)}g</strong></span><span style="color:${PUR}">L <strong>${r2(a.lip*ratio)}g</strong></span></div> <span class="prev-kcal">${Math.round(a.kcal*ratio)} kcal</span></div>`;
+}
+} else {
+const M=S.manual;
+html+=`<div class="g2"> <div class="field span2"><label>Nom</label><input type="text" id="m-nom" value="${esc(M.nom)}" placeholder="ex. Salade niçoise"></div> <div class="field"><label>Quantité (g)</label><input type="number" id="m-qtt" value="${esc(M.qtt)}"></div> <div class="field"><label>Calories (kcal)</label><input type="number" id="m-kcal" value="${esc(M.kcal)}"></div> <div class="field"><label>Protéines (g)</label><input type="number" id="m-prot" value="${esc(M.prot)}"></div> <div class="field"><label>Glucides (g)</label><input type="number" id="m-glu" value="${esc(M.glu)}"></div> <div class="field"><label>Lipides (g)</label><input type="number" id="m-lip" value="${esc(M.lip)}"></div> <div class="field"><label>Repas</label><select id="sel-meal">${MEALS.map(m=>`<option${m===S.meal?” selected”:””}>${esc(m)}</option>`).join("")}</select></div> </div>`;
+}
+html+=`<button class="add-btn" data-action="add-item">+ Ajouter</button></div>`;
 
-  // Log
-  html+=sec("Journal");
-  let hasItems=false;
-  MEALS.forEach(m=>{
-    const mi=items.filter(i=>i.meal===m);
-    if(!mi.length) return;
-    hasItems=true;
-    const mk=mi.reduce((a,i)=>a+i.kcal,0);
-    html+=`<div class="meal-hdr"><span class="mh-name">${m}</span><span class="mh-kcal">${Math.round(mk)} kcal</span></div>`;
-    mi.forEach(item=>{
-      html+=`<div class="fitem">
-        <div class="fitem-info"><div class="fitem-nom">${esc(item.nom)}</div><div class="fitem-q">${item.qtt}g</div></div>
-        <div class="tags"><span class="tag" style="color:${BLU}">P ${r2(item.prot)}g</span><span class="tag" style="color:${ORA}">G ${r2(item.glu)}g</span><span class="tag" style="color:${PUR}">L ${r2(item.lip)}g</span></div>
-        <span class="fkcal">${Math.round(item.kcal)}</span>
-        <button class="del-btn" data-action="del-item" data-id="${item.id}">✕</button>
-      </div>`;
-    });
-  });
-  if(!hasItems) html+=`<div class="empty"><div class="empty-i">🥗</div>Aucun aliment enregistré pour ce jour.</div>`;
-  html+=`</div>`;
+// Log
+html+=sec(“Journal”);
+let hasItems=false;
+MEALS.forEach(m=>{
+const mi=items.filter(i=>i.meal===m);
+if(!mi.length) return;
+hasItems=true;
+const mk=mi.reduce((a,i)=>a+i.kcal,0);
+html+=`<div class="meal-hdr"><span class="mh-name">${m}</span><span class="mh-kcal">${Math.round(mk)} kcal</span></div>`;
+mi.forEach(item=>{
+html+=`<div class="fitem"> <div class="fitem-info"><div class="fitem-nom">${esc(item.nom)}</div><div class="fitem-q">${item.qtt}g</div></div> <div class="tags"><span class="tag" style="color:${BLU}">P ${r2(item.prot)}g</span><span class="tag" style="color:${ORA}">G ${r2(item.glu)}g</span><span class="tag" style="color:${PUR}">L ${r2(item.lip)}g</span></div> <span class="fkcal">${Math.round(item.kcal)}</span> <button class="del-btn" data-action="del-item" data-id="${item.id}">✕</button> </div>`;
+});
+});
+if(!hasItems) html+=`<div class="empty"><div class="empty-i">🥗</div>Aucun aliment enregistré pour ce jour.</div>`;
+html+=`</div>`;
 
-  // Panneau droit
-  html+=`<div class="j-right">
-    <div class="card">
-      <div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT};margin-bottom:10px">Objectifs du jour</div>
-      ${irow("Métabolisme de base",C.mbr+" kcal")}
-      ${irow("Maintenance (TDEE)",C.tdee+" kcal")}
-      ${irow("Déficit −"+S.profil.deficit+"%","−"+Math.round(C.tdee*S.profil.deficit/100)+" kcal",RED)}
-      ${irow("Objectif sèche",C.obj+" kcal",ACC)}
-      <div style="height:1px;background:var(--brd);margin:8px 0"></div>
-      ${irow("Protéines cible",C.protG+"g",BLU)}
-      ${irow("Glucides cible",C.gluG+"g",ORA)}
-      ${irow("Lipides min.",C.lipG+"g",PUR)}
-    </div>
-    ${renderHisto(C.obj)}
+// Panneau droit
+html+=`<div class="j-right">
+<div class="card">
+<div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT};margin-bottom:10px">Objectifs du jour</div>
+${irow(“Métabolisme de base”,C.mbr+” kcal”)}
+${irow(“Maintenance (TDEE)”,C.tdee+” kcal”)}
+${irow(“Déficit −”+S.profil.deficit+”%”,“−”+Math.round(C.tdee*S.profil.deficit/100)+” kcal”,RED)}
+${irow(“Objectif sèche”,C.obj+” kcal”,ACC)}
+<div style="height:1px;background:var(--brd);margin:8px 0"></div>
+${irow(“Protéines cible”,C.protG+“g”,BLU)}
+${irow(“Glucides cible”,C.gluG+“g”,ORA)}
+${irow(“Lipides min.”,C.lipG+“g”,PUR)}
+</div>
+${renderHisto(C.obj)}
+
   </div>`;
   return html;
 }
 
 function renderHisto(obj){
-  const days=[],DN=["D","L","M","M","J","V","S"];
-  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split("T")[0]);}
-  const vals=days.map(d=>(S.journal[d]||[]).reduce((a,i)=>a+i.kcal,0));
-  const maxV=Math.max(obj*1.1,...vals,1),today=todayStr();
-  let bars="";
-  days.forEach((d,i)=>{
-    const v=vals[i],h=v/maxV*100,col=d===today?ACC:v>obj?RED:"#2a2a2a";
-    bars+=`<div class="hcol"><div class="hbar" style="height:${Math.max(h,3)}%;background:${col}" title="${Math.round(v)} kcal"></div><span class="hday">${DN[new Date(d+"T12:00:00").getDay()]}</span></div>`;
-  });
-  return`<div class="histo"><div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT}">Historique 7 jours</div>
-    <div class="histo-bars">${bars}</div>
-    <div style="display:flex;align-items:center;gap:6px"><div style="height:1px;flex:1;background:rgba(200,240,96,.3)"></div><span style="font-size:.6rem;font-family:monospace;color:${ACC}">${obj} kcal</span></div>
+const days=[],DN=[“D”,“L”,“M”,“M”,“J”,“V”,“S”];
+for(let i=6;i>=0;i–){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split(“T”)[0]);}
+const vals=days.map(d=>(S.journal[d]||[]).reduce((a,i)=>a+i.kcal,0));
+const maxV=Math.max(obj*1.1,…vals,1),today=todayStr();
+let bars=””;
+days.forEach((d,i)=>{
+const v=vals[i],h=v/maxV*100,col=d===today?ACC:v>obj?RED:”#2a2a2a”;
+bars+=`<div class="hcol"><div class="hbar" style="height:${Math.max(h,3)}%;background:${col}" title="${Math.round(v)} kcal"></div><span class="hday">${DN[new Date(d+"T12:00:00").getDay()]}</span></div>`;
+});
+return`<div class="histo"><div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT}">Historique 7 jours</div>
+<div class="histo-bars">${bars}</div>
+<div style="display:flex;align-items:center;gap:6px"><div style="height:1px;flex:1;background:rgba(200,240,96,.3)"></div><span style="font-size:.6rem;font-family:monospace;color:${ACC}">${obj} kcal</span></div>
+
   </div>`;
 }
 
 // ═══════════════════ PROFIL ═══════════════════
 function renderProfil(){
-  const p=S.profil;
-  const mm=r2(p.poids*(1-p.tg)),mg=r2(p.poids*p.tg);
-  const mbrK=r2(370+21.6*mm),mbrM=r2(p.sexe==="homme"?10*p.poids+6.25*p.taille-5*p.age+5:10*p.poids+6.25*p.taille-5*p.age-161);
-  const useK=p.tg>0,mbr=useK?mbrK:mbrM,af=ACTIVITY[p.activite]?.f||1.55;
-  const tdee=r2(mbr*af),obj=r2(tdee*(1-p.deficit/100));
-  const protG=r2(p.coefP*mm),lipG=r2(p.coefL*mm),gluG=Math.max(0,r2((obj-protG*4-lipG*9)/4));
-  const defSev=p.deficit<=10?"Léger":p.deficit<=20?"Modéré ✓":p.deficit<=25?"Agressif":"⚠ Très agressif";
-  const defC=p.deficit<=20?ACC:p.deficit<=25?ORA:RED;
+const p=S.profil;
+const mm=r2(p.poids*(1-p.tg)),mg=r2(p.poids*p.tg);
+const mbrK=r2(370+21.6*mm),mbrM=r2(p.sexe===“homme”?10*p.poids+6.25*p.taille-5*p.age+5:10*p.poids+6.25*p.taille-5*p.age-161);
+const useK=p.tg>0,mbr=useK?mbrK:mbrM,af=ACTIVITY[p.activite]?.f||1.55;
+const tdee=r2(mbr*af),obj=r2(tdee*(1-p.deficit/100));
+const protG=r2(p.coefP*mm),lipG=r2(p.coefL*mm),gluG=Math.max(0,r2((obj-protG*4-lipG*9)/4));
+const defSev=p.deficit<=10?“Léger”:p.deficit<=20?“Modéré ✓”:p.deficit<=25?“Agressif”:“⚠ Très agressif”;
+const defC=p.deficit<=20?ACC:p.deficit<=25?ORA:RED;
 
-  function rng(label,id,val,min,max,step,color,marks){
-    return`<div style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <label style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:#555">${esc(label)}</label>
-        <span style="font-size:.7rem;font-family:monospace;color:${color};font-weight:700">${val}</span>
-      </div>
-      <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" style="accent-color:${color};width:100%">
-      <div style="display:flex;justify-content:space-between;font-size:.58rem;color:#3a3a3a;font-family:monospace;margin-top:3px">${marks.map(m=>`<span>${m}</span>`).join("")}</div>
-    </div>`;}
+function rng(label,id,val,min,max,step,color,marks){
+return`<div style="margin-bottom:12px"> <div style="display:flex;justify-content:space-between;margin-bottom:6px"> <label style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:#555">${esc(label)}</label> <span style="font-size:.7rem;font-family:monospace;color:${color};font-weight:700">${val}</span> </div> <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" style="accent-color:${color};width:100%"> <div style="display:flex;justify-content:space-between;font-size:.58rem;color:#3a3a3a;font-family:monospace;margin-top:3px">${marks.map(m=>`<span>${m}</span>`).join("")}</div> </div>`;}
 
-  let h=`<div class="page">`;
+let h=`<div class="page">`;
 
-  // 1. Données
-  h+=stepB("1","Données personnelles")+`<div class="card"><div class="g2" style="margin-bottom:12px">
-    <div class="field"><label>Poids (kg)</label><input type="number" id="p-poids" value="${p.poids}"></div>
-    <div class="field"><label>Taille (cm)</label><input type="number" id="p-taille" value="${p.taille}"></div>
-    <div class="field"><label>Âge</label><input type="number" id="p-age" value="${p.age}"></div>
-    <div class="field"><label>Sexe</label><select id="p-sexe"><option value="homme"${p.sexe==="homme"?" selected":""}>Homme</option><option value="femme"${p.sexe==="femme"?" selected":""}>Femme</option></select></div>
+// 1. Données
+h+=stepB(“1”,“Données personnelles”)+`<div class="card"><div class="g2" style="margin-bottom:12px">
+<div class="field"><label>Poids (kg)</label><input type="number" id="p-poids" value="${p.poids}"></div>
+<div class="field"><label>Taille (cm)</label><input type="number" id="p-taille" value="${p.taille}"></div>
+<div class="field"><label>Âge</label><input type="number" id="p-age" value="${p.age}"></div>
+<div class="field"><label>Sexe</label><select id="p-sexe"><option value=“homme”${p.sexe===“homme”?” selected”:””}>Homme</option><option value=“femme”${p.sexe===“femme”?” selected”:””}>Femme</option></select></div>
+
   </div>
   <div style="display:flex;justify-content:space-between;margin-bottom:6px">
     <label style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:#555">Masse grasse — <strong style="color:${ACC}">${Math.round(p.tg*100)}%</strong></label>
@@ -462,232 +418,176 @@ function renderProfil(){
     ${["4%","8%","12%","16%","20%","25%","30%","35%","40%"].map(m=>`<span>${m}</span>`).join("")}
   </div></div>`;
 
-  // 2. MBR
-  h+=stepB("2","Métabolisme de base")+`<div class="card">
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <div class="mchip" style="background:${useK?"rgba(200,240,96,.1)":"#1a1a1a"};border-color:${useK?"rgba(200,240,96,.3)":"#282828"}">
-        <div class="mchip-t" style="color:${useK?ACC:"#777"};font-weight:${useK?700:400}">Katch-McArdle</div><div class="mchip-s">Recommandé</div></div>
-      <div class="mchip" style="background:${!useK?"rgba(200,240,96,.1)":"#1a1a1a"};border-color:${!useK?"rgba(200,240,96,.3)":"#282828"}">
-        <div class="mchip-t" style="color:${!useK?ACC:"#777"};font-weight:${!useK?700:400}">Mifflin-St Péor</div><div class="mchip-s">Si MG = 0%</div></div>
-    </div>
-    ${useK?irow("Masse maigre",mm+" kg",ACC,`${p.poids} × (1−${Math.round(p.tg*100)}%)`)+irow("MBR",mbrK+" kcal",ACC,`370 + 21.6 × ${mm}`):irow("MBR",mbrM+" kcal",ACC)}
-    <div style="margin-top:10px;padding:8px 12px;background:#1a1a1a;border-radius:7px;font-size:.72rem;color:${MUT}">${useK?"✓ Katch-McArdle actif":"⚠ Renseigne ton taux de graisse pour utiliser Katch-McArdle"}</div>
+// 2. MBR
+h+=stepB(“2”,“Métabolisme de base”)+`<div class="card"> <div style="display:flex;gap:8px;margin-bottom:12px"> <div class="mchip" style="background:${useK?"rgba(200,240,96,.1)":"#1a1a1a"};border-color:${useK?"rgba(200,240,96,.3)":"#282828"}"> <div class="mchip-t" style="color:${useK?ACC:"#777"};font-weight:${useK?700:400}">Katch-McArdle</div><div class="mchip-s">Recommandé</div></div> <div class="mchip" style="background:${!useK?"rgba(200,240,96,.1)":"#1a1a1a"};border-color:${!useK?"rgba(200,240,96,.3)":"#282828"}"> <div class="mchip-t" style="color:${!useK?ACC:"#777"};font-weight:${!useK?700:400}">Mifflin-St Péor</div><div class="mchip-s">Si MG = 0%</div></div> </div> ${useK?irow("Masse maigre",mm+" kg",ACC,`${p.poids} × (1−${Math.round(p.tg*100)}%)`)+irow("MBR",mbrK+" kcal",ACC,`370 + 21.6 × ${mm}`):irow(“MBR”,mbrM+” kcal”,ACC)}
+<div style="margin-top:10px;padding:8px 12px;background:#1a1a1a;border-radius:7px;font-size:.72rem;color:${MUT}">${useK?“✓ Katch-McArdle actif”:“⚠ Renseigne ton taux de graisse pour utiliser Katch-McArdle”}</div>
+
   </div>`;
 
-  // 3. Activité
-  h+=stepB("3","Niveau d'activité → TDEE")+`<div class="card">`;
-  ACTIVITY.forEach((a,i)=>{
-    const sel=p.activite===i;
-    h+=`<div class="aitem${sel?" sel":""}" data-action="set-activite" data-i="${i}">
-      <div><div class="at">${esc(a.label)}</div><div class="ad">${esc(a.desc)}</div></div>
-      <div class="af">×${a.f}${sel?`<br><span style="font-size:.68rem;color:${ACC}">${Math.round(mbr*a.f)} kcal</span>`:""}</div>
-    </div>`;
-  });
-  h+=irow("TDEE",tdee+" kcal",ACC,`${mbr} × ${af}`)+"</div>";
+// 3. Activité
+h+=stepB(“3”,“Niveau d’activité → TDEE”)+`<div class="card">`;
+ACTIVITY.forEach((a,i)=>{
+const sel=p.activite===i;
+h+=`<div class="aitem${sel?" sel":""}" data-action="set-activite" data-i="${i}"> <div><div class="at">${esc(a.label)}</div><div class="ad">${esc(a.desc)}</div></div> <div class="af">×${a.f}${sel?`<br><span style="font-size:.68rem;color:${ACC}">${Math.round(mbr*a.f)} kcal</span>`:""}</div> </div>`;
+});
+h+=irow(“TDEE”,tdee+” kcal”,ACC,`${mbr} × ${af}`)+”</div>”;
 
-  // 4. Déficit
-  h+=stepB("4","Déficit → Objectif sèche")+`<div class="card">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <label style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:#555">Déficit — <strong style="color:${ACC}">${p.deficit}%</strong></label>
-      <span style="font-size:.72rem;font-family:monospace;color:${defC}">${esc(defSev)}</span>
-    </div>
-    <input type="range" id="p-deficit" min="5" max="35" step="1" value="${p.deficit}" style="accent-color:${defC};width:100%">
-    <div style="display:flex;justify-content:space-between;font-size:.58rem;color:#3a3a3a;font-family:monospace;margin-top:3px;margin-bottom:12px">
-      ${["5%","10%","15%","20%","25%","30%","35%"].map(m=>`<span>${m}</span>`).join("")}
-    </div>
-    ${irow("TDEE",tdee+" kcal")}${irow("Déficit","−"+r2(tdee*p.deficit/100)+" kcal",RED)}${irow("Objectif sèche",obj+" kcal",ACC)}
+// 4. Déficit
+h+=stepB(“4”,“Déficit → Objectif sèche”)+`<div class="card"> <div style="display:flex;justify-content:space-between;margin-bottom:6px"> <label style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:#555">Déficit — <strong style="color:${ACC}">${p.deficit}%</strong></label> <span style="font-size:.72rem;font-family:monospace;color:${defC}">${esc(defSev)}</span> </div> <input type="range" id="p-deficit" min="5" max="35" step="1" value="${p.deficit}" style="accent-color:${defC};width:100%"> <div style="display:flex;justify-content:space-between;font-size:.58rem;color:#3a3a3a;font-family:monospace;margin-top:3px;margin-bottom:12px"> ${["5%","10%","15%","20%","25%","30%","35%"].map(m=>`<span>${m}</span>`).join(””)}
+</div>
+${irow(“TDEE”,tdee+” kcal”)}${irow(“Déficit”,“−”+r2(tdee*p.deficit/100)+” kcal”,RED)}${irow(“Objectif sèche”,obj+” kcal”,ACC)}
+
   </div>`;
 
-  // 5. Macros
-  h+=stepB("5","Répartition des macros")+`<div class="card hi">
-    ${rng("Coef. protéines (g/kg maigre)","p-coefP",p.coefP,1.5,3.5,0.1,BLU,["1.5","2.0","2.5","3.0","3.5"])}
-    ${rng("Coef. lipides (g/kg maigre)","p-coefL",p.coefL,0.5,1.5,0.1,PUR,["0.5","0.8","1.0","1.2","1.5"])}
-    ${irow("Protéines",protG+"g · "+protG*4+" kcal",BLU)}
-    ${irow("Lipides",lipG+"g · "+lipG*9+" kcal",PUR)}
-    ${irow("Glucides",gluG+"g · "+Math.round(gluG*4)+" kcal",ORA)}
-    <div class="mbar-wrap">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:.6rem;font-family:monospace;color:${MUT};text-transform:uppercase">Total journalier</span>
-        <span style="font-weight:800;font-size:1.1rem;color:${ACC}">${obj} kcal</span>
-      </div>
-      <div class="mbar-row"><div style="flex:${protG*4};background:${BLU};border-radius:2px"></div><div style="flex:${gluG*4};background:${ORA};border-radius:2px"></div><div style="flex:${lipG*9};background:${PUR};border-radius:2px"></div></div>
-      <div class="mbar-lbls">
-        <span style="color:${BLU}">P ${protG}g (${Math.round(protG*4/obj*100)}%)</span>
-        <span style="color:${ORA}">G ${gluG}g (${Math.round(gluG*4/obj*100)}%)</span>
-        <span style="color:${PUR}">L ${lipG}g (${Math.round(lipG*9/obj*100)}%)</span>
-      </div>
-    </div></div></div>`;
-  return h;
+// 5. Macros
+h+=stepB(“5”,“Répartition des macros”)+`<div class="card hi"> ${rng("Coef. protéines (g/kg maigre)","p-coefP",p.coefP,1.5,3.5,0.1,BLU,["1.5","2.0","2.5","3.0","3.5"])} ${rng("Coef. lipides (g/kg maigre)","p-coefL",p.coefL,0.5,1.5,0.1,PUR,["0.5","0.8","1.0","1.2","1.5"])} ${irow("Protéines",protG+"g · "+protG*4+" kcal",BLU)} ${irow("Lipides",lipG+"g · "+lipG*9+" kcal",PUR)} ${irow("Glucides",gluG+"g · "+Math.round(gluG*4)+" kcal",ORA)} <div class="mbar-wrap"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"> <span style="font-size:.6rem;font-family:monospace;color:${MUT};text-transform:uppercase">Total journalier</span> <span style="font-weight:800;font-size:1.1rem;color:${ACC}">${obj} kcal</span> </div> <div class="mbar-row"><div style="flex:${protG*4};background:${BLU};border-radius:2px"></div><div style="flex:${gluG*4};background:${ORA};border-radius:2px"></div><div style="flex:${lipG*9};background:${PUR};border-radius:2px"></div></div> <div class="mbar-lbls"> <span style="color:${BLU}">P ${protG}g (${Math.round(protG*4/obj*100)}%)</span> <span style="color:${ORA}">G ${gluG}g (${Math.round(gluG*4/obj*100)}%)</span> <span style="color:${PUR}">L ${lipG}g (${Math.round(lipG*9/obj*100)}%)</span> </div> </div></div></div>`;
+return h;
 }
 
 // ═══════════════════ BDD ═══════════════════
 function renderBDD(){
-  const db=allDB().filter(a=>a.nom.toLowerCase().includes(S.bddSearch.toLowerCase()));
-  const N=S.newAl;
-  let h=`<div class="page">
-    ${sec("Base de données — "+allDB().length+" aliments")}
-    <input type="text" id="bdd-search" value="${esc(S.bddSearch)}" placeholder="Rechercher…" style="margin-bottom:12px">
-    <button data-action="toggle-bdd-form" style="width:100%;padding:11px;background:${S.bddForm?"#1f1f1f":ACC};color:${S.bddForm?"#f0ede8":"#0f0f0f"};border:${S.bddForm?"1px solid #2a2a2a":"none"};border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">
-      ${S.bddForm?"✕ Annuler":"+ Nouvel aliment"}
-    </button>`;
+const db=allDB().filter(a=>a.nom.toLowerCase().includes(S.bddSearch.toLowerCase()));
+const N=S.newAl;
+let h=`<div class="page"> ${sec("Base de données — "+allDB().length+" aliments")} <input type="text" id="bdd-search" value="${esc(S.bddSearch)}" placeholder="Rechercher…" style="margin-bottom:12px"> <button data-action="toggle-bdd-form" style="width:100%;padding:11px;background:${S.bddForm?"#1f1f1f":ACC};color:${S.bddForm?"#f0ede8":"#0f0f0f"};border:${S.bddForm?"1px solid #2a2a2a":"none"};border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px"> ${S.bddForm?"✕ Annuler":"+ Nouvel aliment"} </button>`;
 
-  if(S.bddForm){
-    h+=`<div class="card" style="margin-bottom:14px">
-      <div style="font-size:.68rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT};margin-bottom:12px">Valeurs pour 100g / 1 portion</div>
-      <div class="g2">
-        <div class="field span2"><label>Nom</label><input type="text" id="na-nom" value="${esc(N.nom)}" placeholder="ex. Riz complet cuit"></div>
-        <div class="field"><label>Référence</label><input type="text" id="na-ref" value="${esc(N.ref)}" placeholder="100g"></div>
-        <div class="field"><label>Calories (kcal)</label><input type="number" id="na-kcal" value="${esc(N.kcal)}" min="0"></div>
-        <div class="field"><label>Protéines (g)</label><input type="number" id="na-prot" value="${esc(N.prot)}" min="0" step="0.1"></div>
-        <div class="field"><label>Glucides (g)</label><input type="number" id="na-glu" value="${esc(N.glu)}" min="0" step="0.1"></div>
-        <div class="field"><label>Lipides (g)</label><input type="number" id="na-lip" value="${esc(N.lip)}" min="0" step="0.1"></div>
-      </div>
-      ${N.nom&&N.kcal?`<div class="prev-ref" style="margin-top:10px"><div class="prev-nom">${esc(N.nom)}</div><div class="prev-lbl">Pour ${esc(N.ref)}</div><div class="prev-mac"><span style="color:${BLU}">P ${N.prot||0}g</span><span style="color:${ORA}">G ${N.glu||0}g</span><span style="color:${PUR}">L ${N.lip||0}g</span><span style="color:${ACC}">${N.kcal} kcal</span></div></div>`:""}
-      <button class="add-btn" data-action="save-al">✓ Enregistrer</button>
-    </div>`;
-  }
+if(S.bddForm){
+h+=`<div class="card" style="margin-bottom:14px"> <div style="font-size:.68rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT};margin-bottom:12px">Valeurs pour 100g / 1 portion</div> <div class="g2"> <div class="field span2"><label>Nom</label><input type="text" id="na-nom" value="${esc(N.nom)}" placeholder="ex. Riz complet cuit"></div> <div class="field"><label>Référence</label><input type="text" id="na-ref" value="${esc(N.ref)}" placeholder="100g"></div> <div class="field"><label>Calories (kcal)</label><input type="number" id="na-kcal" value="${esc(N.kcal)}" min="0"></div> <div class="field"><label>Protéines (g)</label><input type="number" id="na-prot" value="${esc(N.prot)}" min="0" step="0.1"></div> <div class="field"><label>Glucides (g)</label><input type="number" id="na-glu" value="${esc(N.glu)}" min="0" step="0.1"></div> <div class="field"><label>Lipides (g)</label><input type="number" id="na-lip" value="${esc(N.lip)}" min="0" step="0.1"></div> </div> ${N.nom&&N.kcal?`<div class="prev-ref" style="margin-top:10px"><div class="prev-nom">${esc(N.nom)}</div><div class="prev-lbl">Pour ${esc(N.ref)}</div><div class="prev-mac"><span style="color:${BLU}">P ${N.prot||0}g</span><span style="color:${ORA}">G ${N.glu||0}g</span><span style="color:${PUR}">L ${N.lip||0}g</span><span style="color:${ACC}">${N.kcal} kcal</span></div></div>`:""} <button class="add-btn" data-action="save-al">✓ Enregistrer</button> </div>`;
+}
 
-  if(!db.length) h+=`<div class="empty"><div class="empty-i">🔍</div>Aucun résultat.</div>`;
-  else db.forEach(a=>{
-    h+=`<div class="bitem"><div class="bitem-info"><div class="bnom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div><div class="bref">${esc(a.ref)}</div></div>
-      <div class="bmac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC};font-weight:700">${a.kcal} kcal</span></div>
-      ${a._user?`<button class="del-btn" data-action="del-al" data-nom="${esc(a.nom)}">✕</button>`:""}
-    </div>`;
-  });
-  return h+`</div>`;
+if(!db.length) h+=`<div class="empty"><div class="empty-i">🔍</div>Aucun résultat.</div>`;
+else db.forEach(a=>{
+h+=`<div class="bitem"><div class="bitem-info"><div class="bnom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div><div class="bref">${esc(a.ref)}</div></div> <div class="bmac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC};font-weight:700">${a.kcal} kcal</span></div> ${a._user?`<button class="del-btn" data-action="del-al" data-nom="${esc(a.nom)}">✕</button>`:""} </div>`;
+});
+return h+`</div>`;
 }
 
 // ═══════════════════ EVENTS — enregistrés UNE SEULE FOIS ═══════════════════
 
 // Clicks (délégation)
-document.addEventListener("click",function(e){
-  const t=e.target.closest("[data-action],[data-tab]");
-  if(!t) {
-    // Fermer dropdown si clic en dehors
-    if(S.ddOpen&&!e.target.closest(".dd")){S.ddOpen=false;render();}
-    return;
-  }
-  const act=t.dataset.action, tab=t.dataset.tab;
-  if(tab){S.tab=tab;render();return;}
-  if(act==="mode-bdd"){S.addMode="bdd";render();return;}
-  if(act==="mode-manuel"){S.addMode="manuel";render();return;}
-  if(act==="clear-sel"){S.selAl=null;S.search="";S.ddOpen=false;render();return;}
-  if(act==="pick-al"){
-    const a=_ddFiltered[parseInt(t.dataset.idx)];
-    if(a){S.selAl=a;S.search=a.nom;S.ddOpen=false;S.qtt="100";render();}
-    return;
-  }
-  if(act==="add-item"){
-    const selM=document.getElementById("sel-meal");
-    if(selM) S.meal=selM.value;
-    let item;
-    if(S.addMode==="bdd"&&S.selAl){
-      const a=S.selAl,q=parseFloat(S.qtt)||0,ratio=q/100;
-      item={id:Date.now(),meal:S.meal,nom:a.nom,qtt:q,kcal:r2(a.kcal*ratio),prot:r2(a.prot*ratio),glu:r2(a.glu*ratio),lip:r2(a.lip*ratio)};
-      S.selAl=null;S.search="";S.qtt="100";S.ddOpen=false;
-    } else if(S.addMode==="manuel"){
-      const nom=document.getElementById("m-nom")?.value||"";
-      if(!nom) return;
-      item={id:Date.now(),meal:S.meal,nom,
-        qtt:parseFloat(document.getElementById("m-qtt")?.value)||100,
-        kcal:parseFloat(document.getElementById("m-kcal")?.value)||0,
-        prot:parseFloat(document.getElementById("m-prot")?.value)||0,
-        glu:parseFloat(document.getElementById("m-glu")?.value)||0,
-        lip:parseFloat(document.getElementById("m-lip")?.value)||0};
-      S.manual={nom:"",prot:"",glu:"",lip:"",kcal:"",qtt:"100"};
-    } else return;
-    const d=S.date;
-    S.journal={...S.journal,[d]:[...(S.journal[d]||[]),item]};
-    save();render();return;
-  }
-  if(act==="del-item"){
-    const id=parseInt(t.dataset.id),d=S.date;
-    S.journal={...S.journal,[d]:(S.journal[d]||[]).filter(i=>i.id!==id)};
-    save();render();return;
-  }
-  if(act==="set-activite"){S.profil={...S.profil,activite:parseInt(t.dataset.i)};lsSet("sp",S.profil);render();return;}
-  if(act==="toggle-bdd-form"){S.bddForm=!S.bddForm;render();return;}
-  if(act==="save-al"){
-    const nom=document.getElementById("na-nom")?.value||"";
-    const kcal=document.getElementById("na-kcal")?.value||"";
-    if(!nom||!kcal){alert("Nom et calories obligatoires.");return;}
-    S.dbUser=[...S.dbUser,{nom,ref:document.getElementById("na-ref")?.value||"100g",
-      prot:parseFloat(document.getElementById("na-prot")?.value)||0,
-      glu:parseFloat(document.getElementById("na-glu")?.value)||0,
-      lip:parseFloat(document.getElementById("na-lip")?.value)||0,
-      kcal:parseFloat(kcal)||0}];
-    S.bddForm=false;S.newAl={nom:"",ref:"100g",prot:"",glu:"",lip:"",kcal:""};
-    save();render();return;
-  }
-  if(act==="del-al"){
-    if(confirm("Supprimer "+t.dataset.nom+" ?")){S.dbUser=S.dbUser.filter(a=>a.nom!==t.dataset.nom);save();render();}
-    return;
-  }
+document.addEventListener(“click”,function(e){
+const t=e.target.closest(”[data-action],[data-tab]”);
+if(!t) {
+// Fermer dropdown si clic en dehors
+if(S.ddOpen&&!e.target.closest(”.dd”)){S.ddOpen=false;render();}
+return;
+}
+const act=t.dataset.action, tab=t.dataset.tab;
+if(tab){S.tab=tab;render();return;}
+if(act===“mode-bdd”){S.addMode=“bdd”;render();return;}
+if(act===“mode-manuel”){S.addMode=“manuel”;render();return;}
+if(act===“clear-sel”){S.selAl=null;S.search=””;S.ddOpen=false;render();return;}
+if(act===“pick-al”){
+const a=_ddFiltered[parseInt(t.dataset.idx)];
+if(a){S.selAl=a;S.search=a.nom;S.ddOpen=false;S.qtt=“100”;render();}
+return;
+}
+if(act===“add-item”){
+const selM=document.getElementById(“sel-meal”);
+if(selM) S.meal=selM.value;
+let item;
+if(S.addMode===“bdd”&&S.selAl){
+const a=S.selAl,q=parseFloat(S.qtt)||0,ratio=q/100;
+item={id:Date.now(),meal:S.meal,nom:a.nom,qtt:q,kcal:r2(a.kcal*ratio),prot:r2(a.prot*ratio),glu:r2(a.glu*ratio),lip:r2(a.lip*ratio)};
+S.selAl=null;S.search=””;S.qtt=“100”;S.ddOpen=false;
+} else if(S.addMode===“manuel”){
+const nom=document.getElementById(“m-nom”)?.value||””;
+if(!nom) return;
+item={id:Date.now(),meal:S.meal,nom,
+qtt:parseFloat(document.getElementById(“m-qtt”)?.value)||100,
+kcal:parseFloat(document.getElementById(“m-kcal”)?.value)||0,
+prot:parseFloat(document.getElementById(“m-prot”)?.value)||0,
+glu:parseFloat(document.getElementById(“m-glu”)?.value)||0,
+lip:parseFloat(document.getElementById(“m-lip”)?.value)||0};
+S.manual={nom:””,prot:””,glu:””,lip:””,kcal:””,qtt:“100”};
+} else return;
+const d=S.date;
+S.journal={…S.journal,[d]:[…(S.journal[d]||[]),item]};
+save();render();return;
+}
+if(act===“del-item”){
+const id=parseInt(t.dataset.id),d=S.date;
+S.journal={…S.journal,[d]:(S.journal[d]||[]).filter(i=>i.id!==id)};
+save();render();return;
+}
+if(act===“set-activite”){S.profil={…S.profil,activite:parseInt(t.dataset.i)};lsSet(“sp”,S.profil);render();return;}
+if(act===“toggle-bdd-form”){S.bddForm=!S.bddForm;render();return;}
+if(act===“save-al”){
+const nom=document.getElementById(“na-nom”)?.value||””;
+const kcal=document.getElementById(“na-kcal”)?.value||””;
+if(!nom||!kcal){alert(“Nom et calories obligatoires.”);return;}
+S.dbUser=[…S.dbUser,{nom,ref:document.getElementById(“na-ref”)?.value||“100g”,
+prot:parseFloat(document.getElementById(“na-prot”)?.value)||0,
+glu:parseFloat(document.getElementById(“na-glu”)?.value)||0,
+lip:parseFloat(document.getElementById(“na-lip”)?.value)||0,
+kcal:parseFloat(kcal)||0}];
+S.bddForm=false;S.newAl={nom:””,ref:“100g”,prot:””,glu:””,lip:””,kcal:””};
+save();render();return;
+}
+if(act===“del-al”){
+if(confirm(“Supprimer “+t.dataset.nom+” ?”)){S.dbUser=S.dbUser.filter(a=>a.nom!==t.dataset.nom);save();render();}
+return;
+}
 });
 
 // Inputs (délégation — UN SEUL listener)
-document.addEventListener("input",function(e){
-  const id=e.target.id,v=e.target.value;
-  if(id==="inp-search"){S.search=v;S.selAl=null;S.ddOpen=true;render();return;}
-  if(id==="inp-qtt"){S.qtt=v;render();return;}
-  if(id==="bdd-search"){S.bddSearch=v;render();return;}
-  if(id==="m-nom"){S.manual={...S.manual,nom:v};return;}
-  if(id==="m-qtt"){S.manual={...S.manual,qtt:v};return;}
-  if(id==="m-kcal"){S.manual={...S.manual,kcal:v};render();return;}
-  if(id==="m-prot"){S.manual={...S.manual,prot:v};render();return;}
-  if(id==="m-glu"){S.manual={...S.manual,glu:v};render();return;}
-  if(id==="m-lip"){S.manual={...S.manual,lip:v};render();return;}
-  if(id==="na-nom"){S.newAl={...S.newAl,nom:v};render();return;}
-  if(id==="na-ref"){S.newAl={...S.newAl,ref:v};return;}
-  if(id==="na-kcal"){S.newAl={...S.newAl,kcal:v};render();return;}
-  if(id==="na-prot"){S.newAl={...S.newAl,prot:v};render();return;}
-  if(id==="na-glu"){S.newAl={...S.newAl,glu:v};render();return;}
-  if(id==="na-lip"){S.newAl={...S.newAl,lip:v};render();return;}
-  if(id==="p-poids"){S.profil={...S.profil,poids:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
-  if(id==="p-taille"){S.profil={...S.profil,taille:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
-  if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
-  if(id==="p-tg"){S.profil={...S.profil,tg:parseFloat(v)};lsSet("sp",S.profil);render();return;}
-  if(id==="p-deficit"){S.profil={...S.profil,deficit:parseInt(v)};lsSet("sp",S.profil);render();return;}
-  if(id==="p-coefP"){S.profil={...S.profil,coefP:parseFloat(v)};lsSet("sp",S.profil);render();return;}
-  if(id==="p-coefL"){S.profil={...S.profil,coefL:parseFloat(v)};lsSet("sp",S.profil);render();return;}
+document.addEventListener(“input”,function(e){
+const id=e.target.id,v=e.target.value;
+if(id===“inp-search”){S.search=v;S.selAl=null;S.ddOpen=true;render();return;}
+if(id===“inp-qtt”){S.qtt=v;render();return;}
+if(id===“bdd-search”){S.bddSearch=v;render();return;}
+if(id===“m-nom”){S.manual={…S.manual,nom:v};return;}
+if(id===“m-qtt”){S.manual={…S.manual,qtt:v};return;}
+if(id===“m-kcal”){S.manual={…S.manual,kcal:v};render();return;}
+if(id===“m-prot”){S.manual={…S.manual,prot:v};render();return;}
+if(id===“m-glu”){S.manual={…S.manual,glu:v};render();return;}
+if(id===“m-lip”){S.manual={…S.manual,lip:v};render();return;}
+if(id===“na-nom”){S.newAl={…S.newAl,nom:v};render();return;}
+if(id===“na-ref”){S.newAl={…S.newAl,ref:v};return;}
+if(id===“na-kcal”){S.newAl={…S.newAl,kcal:v};render();return;}
+if(id===“na-prot”){S.newAl={…S.newAl,prot:v};render();return;}
+if(id===“na-glu”){S.newAl={…S.newAl,glu:v};render();return;}
+if(id===“na-lip”){S.newAl={…S.newAl,lip:v};render();return;}
+if(id===“p-poids”){S.profil={…S.profil,poids:parseFloat(v)||0};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-taille”){S.profil={…S.profil,taille:parseFloat(v)||0};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-age”){S.profil={…S.profil,age:parseFloat(v)||0};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-tg”){S.profil={…S.profil,tg:parseFloat(v)};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-deficit”){S.profil={…S.profil,deficit:parseInt(v)};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-coefP”){S.profil={…S.profil,coefP:parseFloat(v)};lsSet(“sp”,S.profil);render();return;}
+if(id===“p-coefL”){S.profil={…S.profil,coefL:parseFloat(v)};lsSet(“sp”,S.profil);render();return;}
 });
 
-document.addEventListener("change",function(e){
-  const id=e.target.id,v=e.target.value;
-  if(id==="sel-meal"){S.meal=v;return;}
-  if(id==="p-sexe"){S.profil={...S.profil,sexe:v};lsSet("sp",S.profil);render();return;}
+document.addEventListener(“change”,function(e){
+const id=e.target.id,v=e.target.value;
+if(id===“sel-meal”){S.meal=v;return;}
+if(id===“p-sexe”){S.profil={…S.profil,sexe:v};lsSet(“sp”,S.profil);render();return;}
 });
 
-document.addEventListener("focus",function(e){
-  if(e.target.id==="inp-search"&&!S.selAl){S.ddOpen=true;render();}
+document.addEventListener(“focus”,function(e){
+if(e.target.id===“inp-search”&&!S.selAl){S.ddOpen=true;render();}
 },true);
 
 // Navigation dates
-document.getElementById("btn-prev").addEventListener("click",()=>{
-  const d=new Date(S.date+"T12:00:00");d.setDate(d.getDate()-1);
-  S.date=d.toISOString().split("T")[0];render();
+document.getElementById(“btn-prev”).addEventListener(“click”,()=>{
+const d=new Date(S.date+“T12:00:00”);d.setDate(d.getDate()-1);
+S.date=d.toISOString().split(“T”)[0];render();
 });
-document.getElementById("btn-next").addEventListener("click",()=>{
-  if(S.date>=todayStr()) return;
-  const d=new Date(S.date+"T12:00:00");d.setDate(d.getDate()+1);
-  S.date=d.toISOString().split("T")[0];render();
+document.getElementById(“btn-next”).addEventListener(“click”,()=>{
+
+const d=new Date(S.date+“T12:00:00”);d.setDate(d.getDate()+1);
+S.date=d.toISOString().split(“T”)[0];render();
 });
 
 // ═══════════════════ SERVICE WORKER (PWA) ═══════════════════
-if("serviceWorker" in navigator){
-  const SW=`
-const CACHE="seche-v1";
-const FILES=["/"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
-self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
-`;
-  const blob=new Blob([SW],{type:"application/javascript"});
-  const url=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(url).catch(()=>{});
+if(“serviceWorker” in navigator){
+const SW=`const CACHE="seche-v1"; const FILES=["/"]; self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)))); self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+const blob=new Blob([SW],{type:“application/javascript”});
+const url=URL.createObjectURL(blob);
+navigator.serviceWorker.register(url).catch(()=>{});
 }
 
 // Init
 render();
 </script>
+
 </body>
 </html>
