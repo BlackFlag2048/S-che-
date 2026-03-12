@@ -628,7 +628,24 @@ document.addEventListener("click",function(e){
 // Inputs (délégation — UN SEUL listener)
 document.addEventListener("input",function(e){
   const id=e.target.id,v=e.target.value;
-  if(id==="inp-search"){S.search=v;S.selAl=null;S.ddOpen=true;render();return;}
+  if(id==="inp-search"){
+    S.search=v;S.selAl=null;S.ddOpen=true;
+    // Mettre à jour uniquement le dropdown sans re-render (évite perte focus iOS)
+    _ddFiltered=allDB().filter(a=>a.nom.toLowerCase().includes(v.toLowerCase())).slice(0,12);
+    let dd=document.getElementById("dd-list");
+    if(!dd){
+      const wrap=document.querySelector(".dd");
+      if(wrap){dd=document.createElement("div");dd.id="dd-list";dd.className="dd-list";wrap.appendChild(dd);}
+    }
+    if(dd){
+      if(!_ddFiltered.length){dd.innerHTML=`<div style="padding:12px 14px;font-size:.82rem;color:${MUT}">Aucun résultat</div>`;}
+      else{dd.innerHTML=_ddFiltered.map((a,i)=>`<div class="dd-item" data-action="pick-al" data-idx="${i}">
+        <span class="dd-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</span>
+        <div class="dd-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal}</span></div>
+      </div>`).join("");}
+    }
+    return;
+  }
   if(id==="inp-qtt"){S.qtt=v;render();return;}
   if(id==="bdd-search"){S.bddSearch=v;render();return;}
   if(id==="m-nom"){S.manual={...S.manual,nom:v};return;}
@@ -659,7 +676,22 @@ document.addEventListener("change",function(e){
 });
 
 document.addEventListener("focus",function(e){
-  if(e.target.id==="inp-search"&&!S.selAl){S.ddOpen=true;render();}
+  if(e.target.id==="inp-search"&&!S.selAl){
+    S.ddOpen=true;
+    // Afficher le dropdown existant ou le créer sans re-render
+    if(!document.getElementById("dd-list")){
+      _ddFiltered=allDB().filter(a=>a.nom.toLowerCase().includes(S.search.toLowerCase())).slice(0,12);
+      const wrap=document.querySelector(".dd");
+      if(wrap){
+        const dd=document.createElement("div");dd.id="dd-list";dd.className="dd-list";
+        dd.innerHTML=_ddFiltered.map((a,i)=>`<div class="dd-item" data-action="pick-al" data-idx="${i}">
+          <span class="dd-nom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</span>
+          <div class="dd-mac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC}">${a.kcal}</span></div>
+        </div>`).join("");
+        wrap.appendChild(dd);
+      }
+    }
+  }
 },true);
 
 // Navigation dates
