@@ -630,6 +630,7 @@ function renderBDD(){
     </div>`;
   }
 
+  h+=`<div id="bdd-list">`;
   if(!db.length) h+=`<div class="empty"><div class="empty-i">🔍</div>Aucun résultat.</div>`;
   else db.forEach(a=>{
     h+=`<div class="bitem"><div class="bitem-info"><div class="bnom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div><div class="bref">${esc(a.ref)}</div></div>
@@ -637,6 +638,7 @@ function renderBDD(){
       ${a._user?`<button class="del-btn" data-action="del-al" data-nom="${esc(a.nom)}">✕</button>`:""}
     </div>`;
   });
+  h+=`</div>`;
   return h+`</div>`;
 }
 
@@ -710,11 +712,14 @@ document.addEventListener("click",function(e){
 });
 
 // Inputs (délégation — UN SEUL listener)
+// Règle iOS : jamais de render() sur les champs texte/number → perte de focus
+// On sauvegarde dans S, render() uniquement sur blur ou pour les sliders/selects
 document.addEventListener("input",function(e){
   const id=e.target.id,v=e.target.value;
+
+  // Recherche aliment — mise à jour dropdown sans re-render
   if(id==="inp-search"){
     S.search=v;S.selAl=null;S.ddOpen=true;
-    // Mettre à jour uniquement le dropdown sans re-render (évite perte focus iOS)
     _ddFiltered=allDB().filter(a=>a.nom.toLowerCase().includes(v.toLowerCase())).slice(0,12);
     let dd=document.getElementById("dd-list");
     if(!dd){
@@ -730,28 +735,68 @@ document.addEventListener("input",function(e){
     }
     return;
   }
-  if(id==="inp-qtt"){S.qtt=v;render();return;}
-  if(id==="bdd-search"){S.bddSearch=v;render();return;}
+
+  // Recherche BDD — mise à jour liste sans re-render
+  if(id==="bdd-search"){
+    S.bddSearch=v;
+    const db=allDB().filter(a=>a.nom.toLowerCase().includes(v.toLowerCase()));
+    const list=document.getElementById("bdd-list");
+    if(list){
+      if(!db.length){list.innerHTML=`<div class="empty"><div class="empty-i">🔍</div>Aucun résultat.</div>`;}
+      else{list.innerHTML=db.map(a=>`<div class="bitem"><div class="bitem-info"><div class="bnom">${esc(a.nom)}${a._user?`<span class="ubadge">perso</span>`:""}</div><div class="bref">${esc(a.ref)}</div></div>
+        <div class="bmac"><span style="color:${BLU}">P ${a.prot}g</span><span style="color:${ORA}">G ${a.glu}g</span><span style="color:${PUR}">L ${a.lip}g</span><span style="color:${ACC};font-weight:700">${a.kcal} kcal</span></div>
+        ${a._user?`<button class="del-btn" data-action="del-al" data-nom="${esc(a.nom)}">✕</button>`:""}
+      </div>`).join("");}
+    }
+    return;
+  }
+
+  // Quantité — mise à jour aperçu sans re-render
+  if(id==="inp-qtt"){
+    S.qtt=v;
+    if(S.selAl){
+      const q=parseFloat(v)||0,ratio=q/100,a=S.selAl;
+      const calc=document.getElementById("prev-calc");
+      if(calc&&q>0){
+        calc.style.display="flex";
+        calc.innerHTML=`<div class="prev-mac2"><span style="color:${BLU}">P <strong>${Math.round(a.prot*ratio*10)/10}g</strong></span><span style="color:${ORA}">G <strong>${Math.round(a.glu*ratio*10)/10}g</strong></span><span style="color:${PUR}">L <strong>${Math.round(a.lip*ratio*10)/10}g</strong></span></div><span class="prev-kcal">${Math.round(a.kcal*ratio)} kcal</span>`;
+      } else if(calc){calc.style.display="none";}
+    }
+    return;
+  }
+
+  // Champs texte/number — sauvegarde state SANS render (clavier reste ouvert)
   if(id==="m-nom"){S.manual={...S.manual,nom:v};return;}
   if(id==="m-qtt"){S.manual={...S.manual,qtt:v};return;}
-  if(id==="m-kcal"){S.manual={...S.manual,kcal:v};render();return;}
-  if(id==="m-prot"){S.manual={...S.manual,prot:v};render();return;}
-  if(id==="m-glu"){S.manual={...S.manual,glu:v};render();return;}
-  if(id==="m-lip"){S.manual={...S.manual,lip:v};render();return;}
-  if(id==="na-nom"){S.newAl={...S.newAl,nom:v};render();return;}
+  if(id==="m-kcal"){S.manual={...S.manual,kcal:v};return;}
+  if(id==="m-prot"){S.manual={...S.manual,prot:v};return;}
+  if(id==="m-glu"){S.manual={...S.manual,glu:v};return;}
+  if(id==="m-lip"){S.manual={...S.manual,lip:v};return;}
+  if(id==="na-nom"){S.newAl={...S.newAl,nom:v};return;}
   if(id==="na-ref"){S.newAl={...S.newAl,ref:v};return;}
-  if(id==="na-kcal"){S.newAl={...S.newAl,kcal:v};render();return;}
-  if(id==="na-prot"){S.newAl={...S.newAl,prot:v};render();return;}
-  if(id==="na-glu"){S.newAl={...S.newAl,glu:v};render();return;}
-  if(id==="na-lip"){S.newAl={...S.newAl,lip:v};render();return;}
-  if(id==="p-poids"){S.profil={...S.profil,poids:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
-  if(id==="p-taille"){S.profil={...S.profil,taille:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
-  if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);render();return;}
+  if(id==="na-kcal"){S.newAl={...S.newAl,kcal:v};return;}
+  if(id==="na-prot"){S.newAl={...S.newAl,prot:v};return;}
+  if(id==="na-glu"){S.newAl={...S.newAl,glu:v};return;}
+  if(id==="na-lip"){S.newAl={...S.newAl,lip:v};return;}
+  if(id==="p-poids"){S.profil={...S.profil,poids:parseFloat(v)||0};lsSet("sp",S.profil);return;}
+  if(id==="p-taille"){S.profil={...S.profil,taille:parseFloat(v)||0};lsSet("sp",S.profil);return;}
+  if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);return;}
+
+  // Sliders — render() OK car pas de clavier
   if(id==="p-tg"){S.profil={...S.profil,tg:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-deficit"){S.profil={...S.profil,deficit:parseInt(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefP"){S.profil={...S.profil,coefP:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefL"){S.profil={...S.profil,coefL:parseFloat(v)};lsSet("sp",S.profil);render();return;}
 });
+
+// Blur — render() quand on quitte un champ texte/number (clavier déjà fermé)
+document.addEventListener("blur",function(e){
+  const id=e.target.id;
+  const textFields=["m-nom","m-qtt","m-kcal","m-prot","m-glu","m-lip",
+    "na-nom","na-ref","na-kcal","na-prot","na-glu","na-lip",
+    "p-poids","p-taille","p-age"];
+  if(textFields.includes(id)) render();
+},true);
 
 document.addEventListener("change",function(e){
   const id=e.target.id,v=e.target.value;
