@@ -250,7 +250,7 @@ let S={
   dbUser:lsGet("sdb",[]),
   search:"",ddOpen:false,selAl:null,qtt:"100",meal:"Déjeuner",addMode:"bdd",
   manual:{nom:"",prot:"",glu:"",lip:"",kcal:"",qtt:"100"},
-  bddSearch:"",bddForm:false,
+  bddSearch:"",bddForm:false,histoPeriod:30,clipboard:null,
   newAl:{nom:"",ref:"100g",prot:"",glu:"",lip:"",kcal:""},
 };
 let _ddFiltered=[];
@@ -376,7 +376,16 @@ function renderJournal(){
     if(!mi.length) return;
     hasItems=true;
     const mk=mi.reduce((a,i)=>a+i.kcal,0);
-    html+=`<div class="meal-hdr"><span class="mh-name">${m}</span><span class="mh-kcal">${Math.round(mk)} kcal</span></div>`;
+    html+=`<div class="meal-hdr">
+      <span class="mh-name">${m}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="mh-kcal">${Math.round(mk)} kcal</span>
+        <button class="copy-meal-btn" data-action="copy-meal" data-meal="${esc(m)}" title="Copier ce repas"
+          style="background:none;border:1px solid #2a2a2a;color:${MUT};border-radius:5px;padding:2px 7px;font-size:.6rem;font-family:monospace;cursor:pointer;white-space:nowrap">
+          ⎘ Copier
+        </button>
+      </div>
+    </div>`;
     mi.forEach(item=>{
       html+=`<div class="fitem">
         <div class="fitem-info"><div class="fitem-nom">${esc(item.nom)}</div><div class="fitem-q">${item.qtt}g</div></div>
@@ -387,6 +396,20 @@ function renderJournal(){
     });
   });
   if(!hasItems) html+=`<div class="empty"><div class="empty-i">🥗</div>Aucun aliment enregistré pour ce jour.</div>`;
+
+  // Bandeau clipboard si repas copié
+  if(S.clipboard){
+    html+=`<div style="background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.25);border-radius:9px;padding:10px 13px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.68rem;font-family:monospace;color:${ACC};text-transform:uppercase;letter-spacing:.05em">⎘ ${esc(S.clipboard.meal)} copié</div>
+        <div style="font-size:.62rem;color:${MUT};margin-top:2px">${S.clipboard.items.length} aliment(s) · ${Math.round(S.clipboard.items.reduce((a,i)=>a+i.kcal,0))} kcal</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button data-action="paste-meal" style="background:${ACC};color:#0a0a0a;border:none;border-radius:6px;padding:6px 10px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:inherit">Coller ici</button>
+        <button data-action="clear-clipboard" style="background:none;border:1px solid #2a2a2a;color:${MUT};border-radius:6px;padding:6px 8px;font-size:.68rem;cursor:pointer">✕</button>
+      </div>
+    </div>`;
+  }
   html+=`</div>`;
 
   // Panneau droit
@@ -403,6 +426,7 @@ function renderJournal(){
       ${irow("Lipides min.",C.lipG+"g",PUR)}
     </div>
     ${renderHisto(C.obj)}
+    ${renderHistoFull(C.obj)}
   </div>`;
   return html;
 }
@@ -525,8 +549,14 @@ function renderHistoFull(obj){
   const allDays=Object.keys(S.journal).sort();
   if(allDays.length===0) return "";
   const today=todayStr();
+  // Calcul de la période selon le slider
+  const allStart=new Date(allDays[0]+"T12:00:00");
+  const allEnd=new Date(today+"T12:00:00");
+  const totalDays=Math.max(1,Math.round((allEnd-allStart)/(864e5))+1);
+  const period=Math.min(S.histoPeriod,totalDays);
+  const startDate=new Date(allEnd);startDate.setDate(startDate.getDate()-(period-1));
   const days=[];
-  let cur=new Date(allDays[0]+"T12:00:00");
+  let cur=new Date(startDate);
   const end=new Date(today+"T12:00:00");
   while(cur<=end){days.push(cur.toISOString().split("T")[0]);cur=new Date(cur);cur.setDate(cur.getDate()+1);}
   const vals=days.map(d=>(S.journal[d]||[]).reduce((a,i)=>a+i.kcal,0));
@@ -549,7 +579,21 @@ function renderHistoFull(obj){
   const ok=days.filter((_,i)=>vals[i]>0&&vals[i]<=obj).length;
   const pctOk=nbJours>0?Math.round(ok/nbJours*100):0;
   return`<div class="histo" style="margin-bottom:14px">
-    <div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT};margin-bottom:8px">Historique complet — ${days.length} jours</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT}">Historique — ${period} jours</div>
+      <span style="font-size:.6rem;font-family:monospace;color:${ACC}">${allDays[0]} → ${today}</span>
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <label style="font-size:.58rem;font-family:monospace;color:${MUT};text-transform:uppercase;letter-spacing:.08em">Période affichée</label>
+        <span style="font-size:.62rem;font-family:monospace;color:${ACC};font-weight:700">${period} j</span>
+      </div>
+      <input type="range" id="histo-period" min="7" max="${totalDays}" step="1" value="${period}"
+        style="accent-color:${ACC};width:100%;height:4px">
+      <div style="display:flex;justify-content:space-between;font-size:.55rem;color:#333;font-family:monospace;margin-top:2px">
+        <span>7j</span><span>30j</span><span>90j</span><span>${totalDays}j</span>
+      </div>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center">
         <div style="font-size:.55rem;color:${MUT};font-family:monospace;margin-bottom:2px">MOY. KCAL</div>
@@ -601,8 +645,6 @@ function renderBDD(){
   const N=S.newAl;
   const C=calcTdee(S.profil);
   let h=`<div class="page">
-    ${sec("Historique complet")}
-    ${renderHistoFull(C.obj)}
     ${sec("Export")}
     <div class="card" style="margin-bottom:14px">
       <div style="font-size:.78rem;color:#aaa;margin-bottom:12px">Exporte tout ton journal au format CSV, ouvrable dans Excel ou Google Sheets.</div>
@@ -705,6 +747,20 @@ document.addEventListener("click",function(e){
     save();render();return;
   }
   if(act==="export-csv"){exportCSV();return;}
+  if(act==="copy-meal"){
+    const meal=t.dataset.meal;
+    const mealItems=(S.journal[S.date]||[]).filter(i=>i.meal===meal);
+    if(mealItems.length){S.clipboard={meal,items:mealItems};render();}
+    return;
+  }
+  if(act==="paste-meal"){
+    if(!S.clipboard) return;
+    const d=S.date;
+    const newItems=S.clipboard.items.map(i=>({...i,id:Date.now()+Math.random()}));
+    S.journal={...S.journal,[d]:[...(S.journal[d]||[]),...newItems]};
+    save();render();return;
+  }
+  if(act==="clear-clipboard"){S.clipboard=null;render();return;}
   if(act==="del-al"){
     if(confirm("Supprimer "+t.dataset.nom+" ?")){S.dbUser=S.dbUser.filter(a=>a.nom!==t.dataset.nom);save();render();}
     return;
@@ -783,6 +839,7 @@ document.addEventListener("input",function(e){
   if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);return;}
 
   // Sliders — render() OK car pas de clavier
+  if(id==="histo-period"){S.histoPeriod=parseInt(v);render();return;}
   if(id==="p-tg"){S.profil={...S.profil,tg:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-deficit"){S.profil={...S.profil,deficit:parseInt(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefP"){S.profil={...S.profil,coefP:parseFloat(v)};lsSet("sp",S.profil);render();return;}
