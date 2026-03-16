@@ -839,21 +839,30 @@ document.addEventListener("input",function(e){
   if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);return;}
 
   // Sliders — render() OK car pas de clavier
-  if(id==="histo-period"){
-    S.histoPeriod=parseInt(v);
-    // Mettre à jour l'affichage du label sans re-render complet
-    const lbl=document.getElementById("histo-period-lbl");
-    if(lbl) lbl.textContent=v+" j";
-    // Re-render différé pour ne pas interrompre le drag du slider
-    clearTimeout(window._histoTimer);
-    window._histoTimer=setTimeout(()=>render(),150);
-    return;
-  }
   if(id==="p-tg"){S.profil={...S.profil,tg:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-deficit"){S.profil={...S.profil,deficit:parseInt(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefP"){S.profil={...S.profil,coefP:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefL"){S.profil={...S.profil,coefL:parseFloat(v)};lsSet("sp",S.profil);render();return;}
 });
+
+// Slider histo-period — listener sur change ET input via delegation robuste iOS
+document.addEventListener("change",function(e){
+  if(e.target.id==="histo-period"){
+    S.histoPeriod=parseInt(e.target.value);
+    render();
+  }
+  if(e.target.id==="sel-meal"){S.meal=e.target.value;return;}
+  if(e.target.id==="p-sexe"){S.profil={...S.profil,sexe:e.target.value};lsSet("sp",S.profil);render();return;}
+});
+
+// Mise à jour label en temps réel pendant le glissement (sans render)
+document.addEventListener("input",function(e){
+  if(e.target.id==="histo-period"){
+    S.histoPeriod=parseInt(e.target.value);
+    const lbl=document.getElementById("histo-period-lbl");
+    if(lbl) lbl.textContent=e.target.value+" j";
+  }
+},true);
 
 // Blur — render() quand on quitte un champ texte/number (clavier déjà fermé)
 document.addEventListener("blur",function(e){
@@ -863,12 +872,6 @@ document.addEventListener("blur",function(e){
     "p-poids","p-taille","p-age"];
   if(textFields.includes(id)) render();
 },true);
-
-document.addEventListener("change",function(e){
-  const id=e.target.id,v=e.target.value;
-  if(id==="sel-meal"){S.meal=v;return;}
-  if(id==="p-sexe"){S.profil={...S.profil,sexe:v};lsSet("sp",S.profil);render();return;}
-});
 
 document.addEventListener("focus",function(e){
   if(e.target.id==="inp-search"&&!S.selAl){
