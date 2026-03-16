@@ -586,7 +586,7 @@ function renderHistoFull(obj){
     <div style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
         <label style="font-size:.58rem;font-family:monospace;color:${MUT};text-transform:uppercase;letter-spacing:.08em">Période affichée</label>
-        <span style="font-size:.62rem;font-family:monospace;color:${ACC};font-weight:700">${period} j</span>
+        <span id="histo-period-lbl" style="font-size:.62rem;font-family:monospace;color:${ACC};font-weight:700">${period} j</span>
       </div>
       <input type="range" id="histo-period" min="7" max="${totalDays}" step="1" value="${period}"
         style="accent-color:${ACC};width:100%;height:4px">
@@ -728,8 +728,8 @@ document.addEventListener("click",function(e){
     save();render();return;
   }
   if(act==="del-item"){
-    const id=parseInt(t.dataset.id),d=S.date;
-    S.journal={...S.journal,[d]:(S.journal[d]||[]).filter(i=>i.id!==id)};
+    const id=t.dataset.id,d=S.date;
+    S.journal={...S.journal,[d]:(S.journal[d]||[]).filter(i=>String(i.id)!==String(id))};
     save();render();return;
   }
   if(act==="set-activite"){S.profil={...S.profil,activite:parseInt(t.dataset.i)};lsSet("sp",S.profil);render();return;}
@@ -839,7 +839,16 @@ document.addEventListener("input",function(e){
   if(id==="p-age"){S.profil={...S.profil,age:parseFloat(v)||0};lsSet("sp",S.profil);return;}
 
   // Sliders — render() OK car pas de clavier
-  if(id==="histo-period"){S.histoPeriod=parseInt(v);render();return;}
+  if(id==="histo-period"){
+    S.histoPeriod=parseInt(v);
+    // Mettre à jour l'affichage du label sans re-render complet
+    const lbl=document.getElementById("histo-period-lbl");
+    if(lbl) lbl.textContent=v+" j";
+    // Re-render différé pour ne pas interrompre le drag du slider
+    clearTimeout(window._histoTimer);
+    window._histoTimer=setTimeout(()=>render(),150);
+    return;
+  }
   if(id==="p-tg"){S.profil={...S.profil,tg:parseFloat(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-deficit"){S.profil={...S.profil,deficit:parseInt(v)};lsSet("sp",S.profil);render();return;}
   if(id==="p-coefP"){S.profil={...S.profil,coefP:parseFloat(v)};lsSet("sp",S.profil);render();return;}
