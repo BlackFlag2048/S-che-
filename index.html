@@ -583,16 +583,14 @@ function renderHistoFull(obj){
       <div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT}">Historique — ${period} jours</div>
       <span style="font-size:.6rem;font-family:monospace;color:${ACC}">${allDays[0]} → ${today}</span>
     </div>
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <label style="font-size:.58rem;font-family:monospace;color:${MUT};text-transform:uppercase;letter-spacing:.08em">Période affichée</label>
-        <span id="histo-period-lbl" style="font-size:.62rem;font-family:monospace;color:${ACC};font-weight:700">${period} j</span>
-      </div>
-      <input type="range" id="histo-period" min="7" max="${totalDays}" step="1" value="${period}"
-        style="accent-color:${ACC};width:100%;height:4px">
-      <div style="display:flex;justify-content:space-between;font-size:.55rem;color:#333;font-family:monospace;margin-top:2px">
-        <span>7j</span><span>30j</span><span>90j</span><span>${totalDays}j</span>
-      </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      ${[7,14,30,90,totalDays].filter((v,i,a)=>a.indexOf(v)===i).map(p=>`
+        <button data-action="set-period" data-p="${p}"
+          style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid ${period===p?"rgba(212,168,67,.5)":"#1c1c1c"};
+          background:${period===p?"rgba(212,168,67,.1)":"#0f0f0f"};
+          color:${period===p?ACC:"#555"};font-size:.6rem;font-family:monospace;cursor:pointer;font-weight:${period===p?700:400}">
+          ${p===totalDays?"Tout":p+"j"}
+        </button>`).join("")}
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center">
@@ -747,6 +745,7 @@ document.addEventListener("click",function(e){
     save();render();return;
   }
   if(act==="export-csv"){exportCSV();return;}
+  if(act==="set-period"){S.histoPeriod=parseInt(t.dataset.p);render();return;}
   if(act==="copy-meal"){
     const meal=t.dataset.meal;
     const mealItems=(S.journal[S.date]||[]).filter(i=>i.meal===meal);
@@ -845,24 +844,11 @@ document.addEventListener("input",function(e){
   if(id==="p-coefL"){S.profil={...S.profil,coefL:parseFloat(v)};lsSet("sp",S.profil);render();return;}
 });
 
-// Slider histo-period — listener sur change ET input via delegation robuste iOS
+// Selects — change listener
 document.addEventListener("change",function(e){
-  if(e.target.id==="histo-period"){
-    S.histoPeriod=parseInt(e.target.value);
-    render();
-  }
   if(e.target.id==="sel-meal"){S.meal=e.target.value;return;}
   if(e.target.id==="p-sexe"){S.profil={...S.profil,sexe:e.target.value};lsSet("sp",S.profil);render();return;}
 });
-
-// Mise à jour label en temps réel pendant le glissement (sans render)
-document.addEventListener("input",function(e){
-  if(e.target.id==="histo-period"){
-    S.histoPeriod=parseInt(e.target.value);
-    const lbl=document.getElementById("histo-period-lbl");
-    if(lbl) lbl.textContent=e.target.value+" j";
-  }
-},true);
 
 // Blur — render() quand on quitte un champ texte/number (clavier déjà fermé)
 document.addEventListener("blur",function(e){
