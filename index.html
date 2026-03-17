@@ -546,76 +546,72 @@ function renderProfil(){
 
 // ═══════════════════ BDD ═══════════════════
 function renderHistoFull(obj){
-  const allDays=Object.keys(S.journal).sort();
+  var allDays=Object.keys(S.journal).sort();
   if(allDays.length===0) return "";
-  const today=todayStr();
-  // Calcul de la période selon le slider
-  const allStart=new Date(allDays[0]+"T12:00:00");
-  const allEnd=new Date(today+"T12:00:00");
-  const totalDays=Math.max(1,Math.round((allEnd-allStart)/(864e5))+1);
-  const period=Math.min(S.histoPeriod,totalDays);
-  const startDate=new Date(allEnd);startDate.setDate(startDate.getDate()-(period-1));
-  const days=[];
-  let cur=new Date(startDate);
-  const end=new Date(today+"T12:00:00");
-  while(cur<=end){days.push(cur.toISOString().split("T")[0]);cur=new Date(cur);cur.setDate(cur.getDate()+1);}
-  const vals=days.map(d=>(S.journal[d]||[]).reduce((a,i)=>a+i.kcal,0));
-  const maxV=Math.max(obj*1.1,...vals,1);
-  const DN=["D","L","M","M","J","V","S"];
-  let bars="";
-  const barW=Math.max(6,Math.min(16,Math.floor(520/days.length)));
-  days.forEach((d,i)=>{
-    const v=vals[i],h=v/maxV*100;
-    const col=d===today?ACC:v===0?"#1a1a1a":v>obj?RED:"#3a7a20";
-    const dow=new Date(d+"T12:00:00").getDay();
-    const showLbl=i===0||dow===1;
-    bars+=`<div class="hcol" style="min-width:${barW}px;max-width:${barW}px">
-      <div class="hbar" style="height:${Math.max(v>0?2:0,h)}%;background:${col}" title="${d}: ${Math.round(v)} kcal"></div>
-      <span class="hday" style="font-size:.42rem">${showLbl?DN[dow]:""}</span>
-    </div>`;
-  });
-  const nbJours=vals.filter(v=>v>0).length;
-  const moy=nbJours>0?Math.round(vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/nbJours):0;
-  const ok=days.filter((_,i)=>vals[i]>0&&vals[i]<=obj).length;
-  const pctOk=nbJours>0?Math.round(ok/nbJours*100):0;
-  return`<div class="histo" style="margin-bottom:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:${MUT}">Historique — ${period} jours</div>
-      <span style="font-size:.6rem;font-family:monospace;color:${ACC}">${allDays[0]} → ${today}</span>
-    </div>
-    <div style="display:flex;gap:6px;margin-bottom:10px">
-      ${[7,14,30,90,totalDays].filter((v,i,a)=>a.indexOf(v)===i).map(p=>`
-        <button data-action="set-period" data-p="${p}"
-          style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid ${period===p?"rgba(212,168,67,.5)":"#1c1c1c"};
-          background:${period===p?"rgba(212,168,67,.1)":"#0f0f0f"};
-          color:${period===p?ACC:"#555"};font-size:.6rem;font-family:monospace;cursor:pointer;font-weight:${period===p?700:400}">
-          ${p===totalDays?"Tout":p+"j"}
-        </button>`).join("")}
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:.55rem;color:${MUT};font-family:monospace;margin-bottom:2px">MOY. KCAL</div>
-        <div style="font-size:.9rem;font-weight:700;color:${moy>obj?RED:ACC}">${moy}</div>
-      </div>
-      <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:.55rem;color:${MUT};font-family:monospace;margin-bottom:2px">JOURS OK</div>
-        <div style="font-size:.9rem;font-weight:700;color:${pctOk>=80?ACC:pctOk>=60?ORA:RED}">${pctOk}%</div>
-      </div>
-      <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:.55rem;color:${MUT};font-family:monospace;margin-bottom:2px">JOURS</div>
-        <div style="font-size:.9rem;font-weight:700;color:#f0ede8">${nbJours}</div>
-      </div>
-    </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <div class="histo-bars" style="height:80px;flex-wrap:nowrap;min-width:max-content">${bars}</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><div style="height:1px;flex:1;background:rgba(200,240,96,.3)"></div><span style="font-size:.6rem;font-family:monospace;color:${ACC}">${obj} kcal</span></div>
-    <div style="display:flex;gap:10px;margin-top:8px;font-size:.58rem;font-family:monospace;color:${MUT}">
-      <span><span style="color:#3a7a20">■</span> OK</span>
-      <span><span style="color:${RED}">■</span> Dépassé</span>
-      <span><span style="color:${ACC}">■</span> Aujourd'hui</span>
-    </div>
-  </div>`;}
+  var today=todayStr();
+  var allEnd=new Date(today+"T12:00:00");
+  var totalDays=Math.max(1,Math.round((allEnd-new Date(allDays[0]+"T12:00:00"))/(864e5))+1);
+  var period=Math.min(S.histoPeriod,totalDays);
+  var startDate=new Date(allEnd);startDate.setDate(startDate.getDate()-(period-1));
+  var days=[];
+  var cur=new Date(startDate);
+  while(cur<=allEnd){days.push(cur.toISOString().split("T")[0]);cur=new Date(cur);cur.setDate(cur.getDate()+1);}
+  var vals=days.map(function(d){return(S.journal[d]||[]).reduce(function(a,i){return a+i.kcal;},0);});
+  var maxV=Math.max(obj*1.1,1);
+  for(var vi=0;vi<vals.length;vi++){if(vals[vi]>maxV)maxV=vals[vi];}
+  var DN=["D","L","M","M","J","V","S"];
+  var bars="";
+  var barW=Math.max(6,Math.min(16,Math.floor(520/days.length)));
+  for(var di=0;di<days.length;di++){
+    var d=days[di],v=vals[di],h=v/maxV*100;
+    var col=d===today?ACC:v===0?"#1a1a1a":v>obj?RED:"#3a7a20";
+    var dow=new Date(d+"T12:00:00").getDay();
+    var showLbl=di===0||dow===1;
+    bars+='<div class="hcol" style="min-width:'+barW+'px;max-width:'+barW+'px">';
+    bars+='<div class="hbar" style="height:'+Math.max(v>0?2:0,h)+'%;background:'+col+'" title="'+d+': '+Math.round(v)+' kcal"></div>';
+    bars+='<span class="hday" style="font-size:.42rem">'+(showLbl?DN[dow]:"")+'</span>';
+    bars+='</div>';
+  }
+  var nbJours=0,sumK=0,ok=0;
+  for(var ki=0;ki<vals.length;ki++){if(vals[ki]>0){nbJours++;sumK+=vals[ki];if(vals[ki]<=obj)ok++;}}
+  var moy=nbJours>0?Math.round(sumK/nbJours):0;
+  var pctOk=nbJours>0?Math.round(ok/nbJours*100):0;
+  // Boutons de période — concaténation simple, zéro template imbriqué
+  var periodOpts=[7,14,30,90,totalDays];
+  var seen={};var uniq=[];
+  for(var pi=0;pi<periodOpts.length;pi++){if(!seen[periodOpts[pi]]){seen[periodOpts[pi]]=1;uniq.push(periodOpts[pi]);}}
+  var pBtns="";
+  for(var bi=0;bi<uniq.length;bi++){
+    var p2=uniq[bi];
+    var active=period===p2;
+    var brd=active?"1px solid rgba(212,168,67,.5)":"1px solid #1c1c1c";
+    var bg=active?"rgba(212,168,67,.1)":"#0f0f0f";
+    var col2=active?ACC:"#555";
+    var fw=active?"700":"400";
+    var lbl=p2===totalDays?"Tout":p2+"j";
+    pBtns+='<button data-action="set-period" data-p="'+p2+'" style="flex:1;padding:8px 4px;border-radius:6px;border:'+brd+';background:'+bg+';color:'+col2+';font-size:.62rem;font-family:monospace;cursor:pointer;font-weight:'+fw+';min-height:40px">'+lbl+'</button>';
+  }
+  var out="";
+  out+='<div class="histo" style="margin-bottom:14px">';
+  out+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+  out+='<div style="font-size:.62rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;color:'+MUT+'">Historique — '+period+' jours</div>';
+  out+='<span style="font-size:.6rem;font-family:monospace;color:'+ACC+'">'+allDays[0]+' → '+today+'</span>';
+  out+='</div>';
+  out+='<div style="display:flex;gap:6px;margin-bottom:10px">'+pBtns+'</div>';
+  out+='<div style="display:flex;gap:8px;margin-bottom:10px">';
+  out+='<div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:.55rem;color:'+MUT+';font-family:monospace;margin-bottom:2px">MOY. KCAL</div><div style="font-size:.9rem;font-weight:700;color:'+(moy>obj?RED:ACC)+'">'+moy+'</div></div>';
+  out+='<div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:.55rem;color:'+MUT+';font-family:monospace;margin-bottom:2px">JOURS OK</div><div style="font-size:.9rem;font-weight:700;color:'+(pctOk>=80?ACC:pctOk>=60?ORA:RED)+'">'+pctOk+'%</div></div>';
+  out+='<div style="flex:1;background:#1a1a1a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:.55rem;color:'+MUT+';font-family:monospace;margin-bottom:2px">JOURS</div><div style="font-size:.9rem;font-weight:700;color:#f0ede8">'+nbJours+'</div></div>';
+  out+='</div>';
+  out+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><div class="histo-bars" style="height:80px;flex-wrap:nowrap;min-width:max-content">'+bars+'</div></div>';
+  out+='<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><div style="height:1px;flex:1;background:rgba(200,240,96,.3)"></div><span style="font-size:.6rem;font-family:monospace;color:'+ACC+'">'+obj+' kcal</span></div>';
+  out+='<div style="display:flex;gap:10px;margin-top:8px;font-size:.58rem;font-family:monospace;color:'+MUT+'">';
+  out+='<span><span style="color:#3a7a20">■</span> OK</span>';
+  out+='<span><span style="color:'+RED+'">■</span> Dépassé</span>';
+  out+='<span><span style="color:'+ACC+'">■</span> Aujourd'hui</span>';
+  out+='</div></div>';
+  return out;
+}
 
 function exportCSV(){
   const allDays=Object.keys(S.journal).sort();
