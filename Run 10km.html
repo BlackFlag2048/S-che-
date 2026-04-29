@@ -12,17 +12,33 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
   :root {
-    --bg: #0d0f14;
-    --surface: #13161d;
-    --card: #1a1e27;
-    --border: #252a36;
-    --green: #4ade80;
-    --yellow: #fbbf24;
-    --red: #f87171;
-    --blue: #60a5fa;
-    --muted: #4a5168;
-    --text: #e2e8f0;
-    --text-dim: #8892a4;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --border: #e2e6ef;
+    --green: #16a34a;
+    --yellow: #d97706;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --muted: #9aa3b4;
+    --text: #0f1117;
+    --text-dim: #4a5168;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161d;
+      --card: #1a1e27;
+      --border: #252a36;
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --blue: #60a5fa;
+      --muted: #4a5168;
+      --text: #e2e8f0;
+      --text-dim: #8892a4;
+    }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -136,13 +152,20 @@
   }
 
   .week-group.light {
-    border-color: #fbbf2440;
-    background: #1a1e27;
+    border-color: #fbbf2450;
+    background: #fffbeb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .week-group.light {
+      background: #1f1a0e;
+      border-color: #fbbf2450;
+    }
   }
 
   .week-label {
     padding: 10px 16px;
-    background: #161a23;
+    background: var(--surface);
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--muted);
@@ -226,7 +249,7 @@
   .tag.rest { background: #f8717118; color: var(--red); border: 1px solid #f8717130; }
 
   .race-card {
-    background: linear-gradient(135deg, #1a2535, #1a1e27);
+    background: linear-gradient(135deg, var(--surface), var(--card));
     border: 1px solid #60a5fa40;
     border-radius: 16px;
     padding: 28px 24px;
@@ -272,7 +295,7 @@
   }
 
   .race-card .strat {
-    background: #ffffff08;
+    background: rgba(0,0,0,0.04);
     border-radius: 10px;
     padding: 14px 16px;
     margin-top: 16px;
