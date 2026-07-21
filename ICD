@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mémento ICD</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mémento ICD">
+<meta name="theme-color" content="#F7F6F2">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231B2A4A'/%3E%3Ctext x='90' y='118' font-family='Arial Black,Arial' font-size='72' font-weight='900' fill='%23F7F6F2' text-anchor='middle'%3EICD%3C/text%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--encre:#1B2A4A;--papier:#F7F6F2;--carte:#FFFFFF;--tampon:#C8102E;--kaki:#4F6446;--graphite:#4A4F5A;--filet:#DDD9CE;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--papier);}
+body{min-height:100vh;color:var(--encre);font-family:'IBM Plex Sans',system-ui,sans-serif;
+  padding:calc(16px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));}
+#app{max-width:560px;margin:0 auto;}
+.head{text-align:center;margin-bottom:18px;}
+.head-rule{height:2px;background:var(--encre);margin:0 8px;}
+.head-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:var(--graphite);margin:8px 0 2px;}
+.head-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:44px;letter-spacing:.06em;line-height:1;}
+.head-sub{font-size:12px;color:var(--graphite);margin:4px 0 8px;}
+.mode-switch{display:flex;gap:8px;margin-bottom:8px;}
+.mode-tab{flex:1;cursor:pointer;padding:10px 8px;background:var(--carte);color:var(--encre);border:2px solid var(--encre);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.04em;}
+.mode-tab.on{background:var(--encre);color:#fff;}
+.mode-count{display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:10px;letter-spacing:.06em;opacity:.75;margin-top:2px;}
+.mode-hint{font-size:12px;color:var(--graphite);margin-bottom:14px;font-style:italic;}
+.scorebar{background:var(--carte);border:1px solid var(--filet);padding:14px 16px;margin-bottom:14px;}
+.scorebar-num{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1;}
+.scorebar-num span{font-size:18px;color:var(--graphite);font-weight:600;}
+.scorebar-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--graphite);margin:2px 0 8px;}
+.scorebar-track{height:5px;background:var(--filet);}
+.scorebar-fill{height:100%;background:var(--kaki);transition:width .4s ease;}
+.btn-main,.btn-review{display:block;width:100%;border:none;cursor:pointer;text-align:left;padding:14px 16px;margin-bottom:10px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:.03em;color:#fff;background:var(--encre);}
+.btn-review{background:var(--tampon);}
+.btn-main-count{display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:10.5px;letter-spacing:.08em;opacity:.85;margin-top:2px;}
+.btn-main:active,.btn-review:active{transform:translateY(1px);}
+.theme-caption{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--graphite);margin:16px 0 8px;}
+.themes{display:flex;flex-direction:column;gap:8px;}
+.theme-row{display:flex;align-items:stretch;background:var(--carte);border:1px solid var(--filet);cursor:pointer;padding:0;text-align:left;width:100%;font-family:inherit;}
+.theme-spine{width:6px;flex:none;}
+.theme-body{flex:1;padding:10px 12px;}
+.theme-name{display:block;font-weight:600;font-size:14px;color:var(--encre);}
+.theme-meta{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--graphite);margin:3px 0 5px;}
+.theme-track{display:block;height:3px;background:var(--filet);}
+.theme-fill{display:block;height:100%;transition:width .4s ease;}
+.theme-go{align-self:center;padding:0 12px;font-size:20px;color:var(--graphite);}
+.btn-reset{margin-top:18px;background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--graphite);text-decoration:underline;}
+.quiz-top{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;}
+.btn-quit{background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--graphite);}
+.quiz-label{font-size:12px;font-weight:600;color:var(--encre);}
+.quiz-progress{height:4px;background:var(--filet);}
+.quiz-progress-fill{height:100%;background:var(--encre);transition:width .3s ease;}
+.quiz-counter{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--graphite);margin:6px 0 12px;}
+.card{display:flex;background:var(--carte);border:1px solid var(--filet);box-shadow:3px 3px 0 rgba(27,42,74,.08);min-height:220px;}
+.card-spine{width:8px;flex:none;}
+.card-inner{flex:1;padding:18px 18px 20px;display:flex;flex-direction:column;}
+.card-theme{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;}
+.card-q{font-size:17.5px;font-weight:600;line-height:1.4;margin-bottom:16px;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt{text-align:left;cursor:pointer;background:var(--papier);border:1.5px solid var(--filet);padding:11px 12px;font-size:14px;font-weight:500;color:var(--encre);font-family:inherit;line-height:1.35;}
+.opt.good{border-color:var(--kaki);background:#EEF2EA;font-weight:600;}
+.opt.bad{border-color:var(--tampon);background:#F9E9EB;}
+.opt.dim{opacity:.45;}
+.qcm-verdict{margin-top:12px;}
+.btn-reveal{margin-top:auto;align-self:flex-start;background:var(--carte);color:var(--encre);border:2px solid var(--encre);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:.05em;padding:9px 18px;}
+.btn-reveal:active{background:var(--encre);color:#fff;}
+.answer{animation:reveal .25s ease;}
+.stamp{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--tampon);
+  border:2px solid var(--tampon);padding:2px 10px;transform:rotate(-2deg);margin-bottom:10px;}
+.stamp-ok{color:var(--kaki);border-color:var(--kaki);}
+.pts{list-style:none;}
+.pts li{font-size:13.5px;line-height:1.5;padding:7px 0 7px 16px;border-bottom:1px dashed var(--filet);position:relative;}
+.pts li::before{content:"—";position:absolute;left:0;color:var(--tampon);font-weight:600;}
+.pts li:last-child{border-bottom:none;}
+.answer-detail{font-size:13px;color:var(--graphite);line-height:1.5;margin-top:8px;font-style:italic;}
+@keyframes reveal{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce){.answer{animation:none;}}
+.grade{display:flex;gap:10px;margin-top:14px;}
+.btn-ko,.btn-ok,.btn-next{flex:1;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.04em;padding:13px 0;color:#fff;}
+.btn-ko{background:var(--tampon);}
+.btn-ok{background:var(--kaki);}
+.btn-next{background:var(--encre);}
+.btn-ko:active,.btn-ok:active,.btn-next:active{transform:translateY(1px);}
+.end{text-align:center;}
+.end-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);margin-bottom:6px;}
+.end-score{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:64px;line-height:1;}
+.end-score span{font-size:28px;color:var(--graphite);}
+.end-verdict{font-size:14px;color:var(--graphite);margin:8px 0 20px;}
+.end-ko-caption{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tampon);text-align:left;margin-bottom:6px;}
+.end-ko-list{list-style:none;text-align:left;margin-bottom:14px;background:var(--carte);border:1px solid var(--filet);padding:10px 12px;}
+.end-ko-list li{font-size:13px;padding:4px 0;line-height:1.4;}
+.btn-secondary{display:block;width:100%;margin-top:8px;background:var(--carte);color:var(--encre);border:1px solid var(--encre);cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:.04em;padding:11px 0;}
+.foot{margin-top:28px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--graphite);letter-spacing:.04em;}
+button:focus-visible{outline:3px solid var(--tampon);outline-offset:2px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var THEMES = [
+  { id: "cp",  name: "Commande publique & marchés de travaux", short: "Commande publique", color: "#8C2F1B" },
+  { id: "sid", name: "Le SID : missions & organisation",        short: "SID",              color: "#1B2A4A" },
+  { id: "sga", name: "SGA & ministère des Armées",              short: "SGA / Ministère",  color: "#2F4B66" },
+  { id: "mil", name: "Culture militaire & LPM",                 short: "Culture mil. / LPM", color: "#4A5240" },
+  { id: "usid", name: "Maintenance, USID & chaîne financière",  short: "Maintenance / USID", color: "#6B5B32" },
+  { id: "rh",  name: "Statuts & fonction publique",             short: "Statuts / RH",     color: "#54306B" },
+  { id: "mgt", name: "Management",                              short: "Management",       color: "#2E5E52" },
+];
+
+var OPEN = [
+  /* ---------- COMMANDE PUBLIQUE ---------- */
+  { id: "o-cp01", t: "cp", q: "Présentez les grandes étapes de la passation d'un marché public de travaux.",
+    pts: [
+      "Définition du besoin : programme de l'opération, études de conception, estimation ; le besoin doit être défini avec précision avant tout lancement (art. L2111-1 CCP).",
+      "Choix de la procédure selon les seuils : dispense (< 40 000 € HT, 100 000 € HT travaux à titre dérogatoire), MAPA sous les seuils européens, procédure formalisée au-delà.",
+      "Rédaction du DCE : règlement de consultation, acte d'engagement, CCAP, CCTP, cadre de décomposition des prix (BPU/DQE ou DPGF), plans.",
+      "Publicité adaptée au montant : BOAMP et/ou JOUE, profil d'acheteur (PLACE pour l'État).",
+      "Réception et analyse : examen des candidatures (capacités techniques, financières, professionnelles) puis des offres selon les critères pondérés annoncés.",
+      "Choix de l'offre économiquement la plus avantageuse, mise au point éventuelle, information des candidats évincés, respect du délai de standstill en procédure formalisée (11 jours).",
+      "Notification du marché — qui rend le marché exécutoire — puis avis d'attribution.",
+    ],
+    plus: "Valorise ton expérience : grilles d'analyse d'offres, sous-critères, traitement d'une égalité de notes dans le respect de l'égalité de traitement." },
+  { id: "o-cp02", t: "cp", q: "Décrivez l'exécution d'un marché de travaux, de la notification à la clôture.",
+    pts: [
+      "Ordre de service de démarrage : point de départ du délai d'exécution ; période de préparation éventuelle (plans d'exécution, PPSPS, agréments).",
+      "Suivi de chantier par le MOE : réunions hebdomadaires, comptes rendus, contrôle de conformité, visas des documents d'exécution.",
+      "Circuit financier : situations mensuelles de l'entreprise, vérification MOE, acomptes payés dans le délai global de 30 jours.",
+      "Gestion des évolutions : ordres de service, avenants (travaux modificatifs), révision ou actualisation des prix selon le CCAP.",
+      "Opérations préalables à la réception (OPR) menées par le MOE, puis réception prononcée par le MOA, avec ou sans réserves.",
+      "Levée des réserves, remise des DOE et du DIUO, transfert à l'exploitant.",
+      "Clôture financière : projet de décompte final de l'entreprise, décompte général, signature du DGD qui solde définitivement le marché.",
+      "Suivi de la garantie de parfait achèvement pendant un an.",
+    ] },
+  { id: "o-cp03", t: "cp", q: "Quelles sont les garanties dont bénéficie le maître d'ouvrage après la réception ?",
+    pts: [
+      "Garantie de parfait achèvement (1 an, art. 1792-6 C. civ.) : l'entrepreneur reprend tous les désordres signalés à la réception ou notifiés dans l'année.",
+      "Garantie de bon fonctionnement, dite biennale (2 ans, art. 1792-3) : équipements dissociables de l'ouvrage (robinetterie, volets, chaudière démontable...).",
+      "Garantie décennale (10 ans, art. 1792) : dommages compromettant la solidité de l'ouvrage ou le rendant impropre à sa destination ; responsabilité de plein droit des constructeurs.",
+      "Sûretés financières : retenue de garantie de 5 % maximum (ou garantie à première demande) restituée à la fin de la GPA.",
+      "Assurances : responsabilité décennale obligatoire des constructeurs ; dommages-ouvrage côté MOA (l'État en est dispensé, étant son propre assureur).",
+      "Point de départ commun de toutes ces garanties : la réception.",
+    ] },
+  { id: "o-cp04", t: "cp", q: "Citez les acteurs d'une opération de construction publique et leurs rôles respectifs.",
+    pts: [
+      "Le maître d'ouvrage : personne pour laquelle l'ouvrage est construit ; il définit le programme, l'enveloppe financière, choisit le processus et réceptionne. Au SID : l'État, représenté par la chaîne DCSID/ESID.",
+      "Le conducteur d'opération / l'AMO : assistance générale au MOA (administrative, financière, technique).",
+      "Le maître d'œuvre : conception et direction de l'exécution des travaux ; propose la réception. Au SID : MOE privée ou MOE interne (bureaux de maîtrise d'œuvre).",
+      "Les entreprises de travaux : exécutent conformément aux pièces du marché ; possibilité de groupements et de sous-traitance.",
+      "Le contrôleur technique : avis sur la solidité et la sécurité des personnes ; obligatoire pour certains ouvrages (ERP, IGH...).",
+      "Le coordonnateur SPS : prévention des risques liés à la coactivité ; PGC, RJC, DIUO.",
+      "L'OPC : ordonnancement, pilotage, coordination des travaux ; le coordonnateur SSI pour les systèmes de sécurité incendie.",
+      "L'exploitant / l'utilisateur final — au ministère : la formation soutenue et l'USID qui reprend l'ouvrage.",
+    ] },
+  { id: "o-cp05", t: "cp", q: "Présentez les éléments de mission de maîtrise d'œuvre.",
+    pts: [
+      "Études d'esquisse (ESQ) : vérifier la faisabilité au regard du programme.",
+      "Avant-projet sommaire (APS) puis définitif (APD) : composition, dimensions, aspect, estimation définitive des travaux ; l'APD arrête le coût prévisionnel et permet le dépôt du permis de construire.",
+      "Études de projet (PRO) : spécifications techniques détaillées par lot, plans, coût par lot.",
+      "Assistance aux contrats de travaux (ACT) : DCE, analyse des offres, mise au point des marchés.",
+      "EXE ou VISA : études d'exécution réalisées par la MOE, ou visa des études de l'entreprise.",
+      "Direction de l'exécution des contrats de travaux (DET) : ordres de service, réunions, vérification des situations.",
+      "Assistance aux opérations de réception (AOR) : OPR, suivi des réserves, dossiers des ouvrages exécutés, suivi pendant la GPA.",
+      "Mission complémentaire d'OPC possible ; en marché public, mission de base obligatoire en bâtiment (conception + suivi non dissociables).",
+    ],
+    plus: "En interne SID, ces missions sont assurées par les bureaux de maîtrise d'œuvre — c'est ton quotidien de chef de projets : AVP, CCTP, analyse des offres, conduite de chantier." },
+  { id: "o-cp06", t: "cp", q: "Quelles procédures de passation connaissez-vous et dans quels cas les utiliser ?",
+    pts: [
+      "L'appel d'offres ouvert ou restreint : procédure formalisée de droit commun ; choix sur critères sans négociation.",
+      "La procédure avec négociation : possible seulement dans les cas prévus (besoin de solutions innovantes ou adaptées, échec d'un AO...).",
+      "Le dialogue compétitif : quand l'acheteur ne peut définir seul les moyens techniques de son besoin.",
+      "Le MAPA sous les seuils européens : modalités librement définies, négociation possible, procédure proportionnée.",
+      "Les marchés sans publicité ni mise en concurrence : moins de 40 000 € HT, urgence impérieuse, prestataire unique, marchés infructueux.",
+      "Techniques d'achat : accords-cadres (à bons de commande ou marchés subséquents), largement utilisés au SID via le CNPID.",
+      "Le concours de maîtrise d'œuvre : sélection d'un projet sur prestations, notamment pour les ouvrages à enjeu architectural.",
+    ] },
+  { id: "o-cp07", t: "cp", q: "Une offre vous paraît anormalement basse : que faites-vous ?",
+    pts: [
+      "Ne jamais la rejeter automatiquement : l'acheteur doit d'abord demander par écrit à l'entreprise de justifier son prix (art. L2152-6 et R2152-3 CCP).",
+      "Analyser les justifications : mode d'exécution, conditions d'approvisionnement, aides éventuelles, respect du droit du travail et des obligations sociales.",
+      "Comparer à l'estimation, aux autres offres et aux prix de référence (ex. ratios, Batiprix) — un écart important est un indice, pas une preuve.",
+      "Rejeter par décision motivée si les justifications sont insuffisantes : une OAB compromet la bonne exécution et fausse la concurrence.",
+      "Enjeu : protéger le marché ET l'égalité de traitement ; en cas de doute sérieux non levé, le rejet est une obligation.",
+    ] },
+  { id: "o-cp08", t: "cp", q: "Parlez-moi des différentes formes de prix dans les marchés de travaux.",
+    pts: [
+      "Prix forfaitaire : rémunère une prestation globale définie (DPGF) ; répartit le risque de quantités sur l'entreprise ; adapté au bâtiment.",
+      "Prix unitaires : appliqués aux quantités réellement exécutées (BPU + DQE) ; adaptés aux travaux dont les quantités sont incertaines (VRD, maintenance).",
+      "Prix ferme : non modifiable ; admissible seulement si l'évolution des coûts est faible ; fermes actualisables si plus de 3 mois entre remise de l'offre et démarrage.",
+      "Prix révisable : obligatoire pour les marchés portant sur des matières exposées aux fluctuations (la plupart des travaux) ; formule de révision au CCAP avec index BT/TP et coefficient.",
+      "Partie fixe usuelle des formules : 12,5 % (clause butoir et sauvegarde à connaître).",
+      "Distinction actualisation (une fois, avant exécution) / révision (périodique, pendant l'exécution).",
+    ] },
+  { id: "o-cp09", t: "cp", q: "Quel est le régime de la sous-traitance dans les marchés publics ?",
+    pts: [
+      "Cadre : loi du 31 décembre 1975 ; la sous-traitance totale est interdite, l'entrepreneur principal reste responsable de l'ensemble.",
+      "Chaque sous-traitant doit être déclaré (DC4), accepté par le MOA et ses conditions de paiement agréées — possible au dépôt de l'offre ou en cours d'exécution.",
+      "Paiement direct par le maître d'ouvrage obligatoire dès que la part sous-traitée dépasse 600 €.",
+      "Vigilance de l'acheteur : lutte contre le travail dissimulé (attestations sociales et fiscales, liste des salariés étrangers), offres anormalement basses en cascade.",
+      "Le sous-traitant de second rang n'a pas droit au paiement direct mais doit être garanti par une caution du sous-traitant de 1er rang.",
+    ] },
+  { id: "o-cp10", t: "cp", q: "Décrivez le circuit financier d'un marché de travaux.",
+    pts: [
+      "Avance : obligatoire si montant > 50 000 € HT et délai > 2 mois ; minimum 5 % (jusqu'à 30 %) ; remboursée par précompte entre 65 % et 80 % d'avancement.",
+      "Acomptes mensuels sur la base des situations de travaux : constat d'avancement par le MOE, paiement par le comptable public.",
+      "Délai global de paiement de 30 jours pour l'État ; au-delà, intérêts moratoires de plein droit + indemnité forfaitaire de 40 € pour frais de recouvrement.",
+      "Retenue de garantie de 5 % max prélevée sur chaque acompte, ou garantie à première demande substituée.",
+      "Variation des prix appliquée aux acomptes selon la formule du marché (révision) ; TVA et éventuelle cotraitance à gérer.",
+      "Solde : PV de réception, projet de décompte final, décompte général, DGD signé — le paiement du solde clôt le marché ; réclamations possibles dans les délais du CCAG.",
+    ] },
+  { id: "o-cp11", t: "cp", q: "Comment analyse-t-on les candidatures puis les offres ?",
+    pts: [
+      "Deux temps strictement distincts : la candidature juge l'entreprise, l'offre juge la réponse au besoin — interdiction de mélanger les deux.",
+      "Candidatures : capacités professionnelles (qualifications type Qualibat/Qualifelec ou références équivalentes), techniques (moyens humains et matériels) et financières (CA) ; interdictions de soumissionner.",
+      "Régularisation possible des candidatures incomplètes (DUME, DC1/DC2).",
+      "Offres : élimination des offres inappropriées, irrégulières ou inacceptables (régularisation possible des offres irrégulières en MAPA/négociation si non substantielle).",
+      "Notation sur les critères pondérés annoncés : prix (formules de notation), valeur technique (mémoire : méthodologie, moyens, planning, gestion des déchets...), délais.",
+      "Rapport d'analyse des offres transparent et traçable : chaque note doit pouvoir être justifiée devant le juge — et devant le candidat évincé.",
+    ],
+    plus: "Appuie-toi sur ton vécu : analyse multi-sous-critères, égalité de traitement, refus de toute consigne visant à orienter le classement." },
+  { id: "o-cp12", t: "cp", q: "Dans quels cas peut-on modifier un marché en cours d'exécution ?",
+    pts: [
+      "Cadre : articles R2194-1 et suivants du CCP — les modifications ne doivent pas changer la nature globale du marché.",
+      "Clauses de réexamen prévues au contrat (options, variations de quantités, révisions).",
+      "Travaux supplémentaires devenus nécessaires, si un changement de titulaire est impossible — limite 50 % par modification pour les pouvoirs adjudicateurs.",
+      "Circonstances imprévues qu'un acheteur diligent ne pouvait prévoir — même limite de 50 %.",
+      "Modifications de faible montant « de minimis » : moins de 10 % (services/fournitures) ou 15 % (travaux) du montant initial, sous le seuil européen.",
+      "Substitution de titulaire dans les cas prévus (cession, restructuration).",
+      "Toute modification substantielle hors de ces cas impose une nouvelle procédure ; formalisation par avenant ou décision unilatérale selon le cas.",
+    ] },
+
+  /* ---------- SID ---------- */
+  { id: "o-sid01", t: "sid", q: "Présentez le Service d'infrastructure de la Défense en deux minutes.",
+    pts: [
+      "Identité : service interarmées rattaché au SGA, créé en 2005 par fusion des trois services constructeurs (Génie, Travaux maritimes, infrastructure Air) ; expert infrastructure et énergie du ministère.",
+      "Chiffres : ~6 700 agents dont deux tiers de civils, ~2,5 Mds€ de budget ; le ministère détient le plus vaste domaine immobilier de l'État (27 %, ~275 000 ha, plus de 100 000 ouvrages).",
+      "Quatre missions : contrat opérationnel ; construction et maintenance ; environnement et énergie ; compétences et expertise.",
+      "Maillage : direction centrale, 7 ESID en métropole, une cinquantaine d'USID au contact des bases de défense, 9 DID outre-mer et à l'étranger.",
+      "Trois centres nationaux : CETID (expertise technique), CNPID (production d'ingénierie), ENSIM à Angers (formation).",
+      "Action de la dissuasion aux OPEX : Île Longue, futur PANG, soutien au stationnement des forces sur une douzaine de sites dans 7 pays.",
+      "En transformation pour répondre à la LPM 2024-2030 : performance, crédibilité, efficience.",
+    ] },
+  { id: "o-sid02", t: "sid", q: "Décrivez la vie d'une opération d'infrastructure au SID, de l'expression du besoin à la garantie.",
+    pts: [
+      "Expression du besoin par le bénéficiaire (armée, direction ou service), formalisée puis instruite ; inscription à la programmation et création dans COSI (projet → opération → affaires → contrats).",
+      "Études amont : faisabilité, programme, choix du mode de réalisation (MOE privée ou interne), estimation et calendrier.",
+      "Conception : AVP (validation du coût et dépôt des autorisations d'urbanisme), puis PRO et constitution du DCE par lots.",
+      "Passation des marchés de travaux et de prestations associées (CT, SPS, OPC, SSI) par le service achats de l'ESID.",
+      "Travaux : conduite de chantier, maîtrise des coûts, délais et qualité — cœur du métier de chef de projets techniques.",
+      "Réception, levée des réserves, DOE/DIUO, transfert à l'USID qui assurera la gestion et la maintenance.",
+      "Suivi de la GPA avec inspection avant fin de garantie ; retour d'expérience réinjecté dans les opérations suivantes.",
+    ] },
+  { id: "o-sid03", t: "sid", q: "Quels sont les enjeux infrastructure de la LPM 2024-2030 pour le SID ?",
+    pts: [
+      "Trois défis affichés : construire les nouvelles infrastructures (accueil des programmes SCORPION, PANG, MRTT, munitions...), tenir le contrat opérationnel, maintenir l'existant.",
+      "Accompagner la haute intensité : durcissement, résilience des emprises, soutien aux déploiements (Roumanie, flanc Est).",
+      "Transition énergétique : stratégie ministérielle de performance énergétique, contrats de performance énergétique, conversion des chaufferies, sobriété.",
+      "Renforcement RH : +211 postes ciblés sur la direction de projets, la conduite d'opérations, les achats et les fonctions supports ; académie de l'infrastructure à Angers.",
+      "Efficience : standardisation des besoins génériques, recours aux accords-cadres (CNPID), concentration de l'ingénierie intégrée sur les opérations spécifiquement militaires.",
+      "Contexte : durcissement géopolitique, mutations sociétales et ruptures technologiques imposent l'adaptation permanente.",
+    ] },
+  { id: "o-sid04", t: "sid", q: "Présentez la transformation du SID (cadrage stratégique).",
+    pts: [
+      "Trois engagements, piliers de la transformation : consolider la performance, renforcer la crédibilité auprès des partenaires, affermir l'efficience des moyens.",
+      "Cinq objectifs : conforter la position de référent-expert ; être uni, attractif et innovant ; mettre la transition écologique au cœur des activités ; adapter la ressource humaine ; maîtriser coûts, délais et qualité.",
+      "Leviers : organisation clarifiant rôles et responsabilités, management par la performance et mode projet, indicateurs adaptés, comptabilité analytique.",
+      "Conseil « de bout en bout » aux bénéficiaires : faisabilité, coûts, délais, performance dès l'expression de besoin, avec analyse de la valeur.",
+      "Ressources humaines : recruter, former, accompagner, fidéliser ; création de l'académie ministérielle de l'infrastructure à Angers (former, tripler la capacité, modulariser, former à distance).",
+      "Innovation et qualité de vie au travail comme conditions d'attractivité.",
+    ] },
+  { id: "o-sid05", t: "sid", q: "Que fait le SID en matière d'énergie et d'environnement ?",
+    pts: [
+      "Référent ministériel de la maîtrise de l'énergie non stockée ; mise en œuvre de la stratégie ministérielle de performance énergétique (SMPE).",
+      "Contrats de performance énergétique : 10e CPE signé en 2023 ; garantie contractuelle d'économies d'énergie.",
+      "Plan de conversion des chaufferies les plus émissives, raccordement aux réseaux de chaleur urbains (76e site raccordé).",
+      "Mobilité électrique : ~947 bornes de recharge installées sur les emprises.",
+      "Environnement : gestion de l'eau, biodiversité, dépollution des sites et sols, gestion des déchets de chantier — à intégrer dès la conception (CCTP, SOGED).",
+      "Adaptation au changement climatique : résilience et sobriété des infrastructures inscrites au cadrage stratégique.",
+    ] },
+  { id: "o-sid06", t: "sid", q: "Parlez-moi de l'action du SID en OPEX et à l'étranger.",
+    pts: [
+      "Mission de contrat opérationnel : répondre aux besoins en infrastructure des forces en tout temps et en tous lieux, y compris sur les théâtres.",
+      "Soutien au stationnement des forces sur une douzaine de sites dans 7 pays ; environ 200 militaires du SID projetés chaque année, ~67 M€ de travaux au profit des forces en opérations.",
+      "Exemples récents : extension du camp de Cincu en Roumanie (accueil jusqu'à 2 000 personnes, quartier français), plateforme drones en Jordanie, bâtiments techniques au Levant, soutien au Tchad et à Djibouti.",
+      "Réponse technique sous court préavis, adaptée aux contraintes locales (climat, logistique, sécurité).",
+      "Les 9 DID assurent en parallèle le soutien permanent outre-mer et à l'étranger (forces de souveraineté et de présence).",
+      "Composante militaire du SID (ingénieurs militaires d'infrastructure formés à l'ENSIM) indispensable à cette projection.",
+    ] },
+  { id: "o-sid07", t: "sid", q: "Retracez les grands jalons de l'histoire de l'infrastructure militaire française.",
+    pts: [
+      "1543 : François Ier crée la surintendance des fortifications ; les ingénieurs italiens (et Léonard de Vinci) importent l'art des fortifications.",
+      "XVIIe : Vauban porte l'art de la fortification à son apogée ; 1691, Le Peletier de Souzy regroupe les services constructeurs des « places de terre et de mer ».",
+      "1748 : création de l'école royale du génie de Mézières ; 1794, l'école centrale des travaux publics devient Polytechnique (Carnot, Monge).",
+      "Après 1870 : le système défensif Séré de Rivières ; entre-deux-guerres : la ligne Maginot (général Belhague), l'ingénieur Albert Caquot.",
+      "1966-1969 : chantier de l'Île Longue pour la force océanique stratégique, le plus grand d'Europe à l'époque.",
+      "2005 : création du SID par fusion des trois services constructeurs ; 2011 : ESID et USID ; 2015 : CETID ; 2020 : CNPID.",
+    ] },
+  { id: "o-sid08", t: "sid", q: "Expliquez les rôles respectifs de la DCSID, d'un ESID et d'une USID.",
+    pts: [
+      "DCSID (direction centrale) : politique et doctrine, pilotage du réseau, programmation nationale, politique d'achats infrastructure et énergie du ministère, grands programmes (23 programmes traités).",
+      "ESID (7 en métropole) : échelon de zone ; conduit les opérations d'investissement, porte les divisions Plan, Investissement, Gestion du patrimoine et le service achats ; coordonne ses USID.",
+      "USID (~50) : échelon de proximité au profit de la base de défense ; assistance au commandement, gestion du domaine, gestion technique du patrimoine, énergie, maintien en condition ; conduite d'opérations de complexité faible à moyenne (USID nouvelle génération).",
+      "Outre-mer et étranger : les 9 DID cumulent les fonctions d'ESID et d'USID sur leur territoire.",
+      "Appui transverse des centres : CETID (expertise), CNPID (production, accords-cadres), ENSIM (formation).",
+    ] },
+  { id: "o-sid09", t: "sid", q: "Quelle est la valeur ajoutée des centres nationaux du SID ?",
+    pts: [
+      "CETID (2015) : centre d'expertise des techniques d'infrastructure ; ~1 200 expertises et expérimentations par an, référentiels techniques, instruction de ~450 dossiers de régimes de tir.",
+      "CNPID (2020) : centre national de production d'ingénierie ; prestations standardisées et accords-cadres (~130 M€ d'engagements) qui soulagent le réseau et homogénéisent la qualité.",
+      "ENSIM (Angers) : formation initiale et continue, notamment des ingénieurs militaires d'infrastructure (40 IMI recrutés en 2023) ; future académie de l'infrastructure adossée.",
+      "Logique commune : mutualiser les compétences rares, standardiser, capitaliser le retour d'expérience au profit de tout le réseau.",
+    ] },
+  { id: "o-sid10", t: "sid", q: "Qu'apporteriez-vous au SID en tant qu'ICD, au regard de votre parcours ?",
+    pts: [
+      "Une connaissance opérationnelle de la chaîne : expérience de chef de projets techniques en division investissement (AVP, CCTP multi-lots, analyse d'offres, conduite d'opérations).",
+      "Une maîtrise concrète de la commande publique : rédaction de pièces de marchés, grilles d'analyse pondérées, rigueur sur l'égalité de traitement et la traçabilité.",
+      "Une culture technique transverse : gros œuvre, CVC, électricité, second œuvre, réglementations (incendie, PPRT, sismique, environnement).",
+      "L'envie de m'inscrire dans la durée : la titularisation traduit un engagement pérenne au service de l'État et du ministère.",
+      "Des qualités attendues d'un cadre A : rigueur, organisation, capacité à piloter une équipe projet (chargés de projets, BET, dessinateurs) et à rendre compte.",
+      "À personnaliser avec deux ou trois réalisations chiffrées prêtes à être racontées (contexte, action, résultat).",
+    ] },
+
+  /* ---------- SGA & MINISTÈRE ---------- */
+  { id: "o-sga01", t: "sga", q: "Présentez le SGA et ses grandes directions.",
+    pts: [
+      "Création gaullienne originale : le SGA assure la cohérence entre les ambitions de la politique de défense et les ressources consacrées par la Nation (humaines, financières, immobilières).",
+      "~15 000 agents civils et militaires, en métropole, outre-mer et à l'étranger ; interface avec l'interministériel, le Parlement, les organes de contrôle.",
+      "Directions expertes : DAF (finances), DRH-MD (ressources humaines), DAJ (juridique), DTIE (territoires, immobilier, environnement), DMCA (mémoire, culture, archives), DSNJ (jeunesse), SID (infrastructure), DTPM (transformation et performance ministérielles).",
+      "Politiques publiques portées : logement, développement durable, éducation-jeunesse (SNU, JDC), culture et mémoire, encadrement supérieur.",
+      "Il impulse les grandes réformes : haute fonction publique, politique immobilière de l'État, numérique, économie de guerre.",
+      "Le SID en est le service d'infrastructure : c'est le rattachement à connaître parfaitement.",
+    ] },
+  { id: "o-sga02", t: "sga", q: "Le ministère des Armées en chiffres : que citer à l'oral ?",
+    pts: [
+      "Budget : mission Défense 43,9 Mds€ en 2023, trajectoire LPM vers 2 % du PIB dès 2025, ~64 Mds€ visés en 2027.",
+      "Premier recruteur de l'État : ~30 000 recrutements par an (dont ~5 700 civils).",
+      "Premier acheteur et investisseur public : plus de 25 000 entreprises fournisseurs.",
+      "Premier bailleur foncier : ~275 000 ha, 40 % des emprises foncières de l'État, 34 340 logements.",
+      "Effectifs civils : ~64 000 agents, 5e ministère employeur civil ; ~63 % des effectifs du ministère sont militaires.",
+      "Patrimoine : plus de 100 000 ouvrages, ~29 millions de m² bâtis — d'où le rôle central du SID.",
+    ] },
+  { id: "o-sga03", t: "sga", q: "Quel est le rôle du chef d'état-major des armées ?",
+    pts: [
+      "Sous l'autorité du Président de la République (chef des armées) et du Gouvernement, il est responsable de l'emploi des forces et commande les opérations militaires.",
+      "Conseiller militaire du Gouvernement.",
+      "Responsable de l'organisation interarmées, du format d'ensemble et de la cohérence capacitaire, de la préparation et de la mise en condition d'emploi des armées.",
+      "Responsable du soutien des armées, du renseignement d'intérêt militaire (autorité sur la DRM) et des relations internationales militaires (OTAN, UE).",
+      "Autorité sur les chefs d'état-major des trois armées, les commandants supérieurs outre-mer et à l'étranger, les officiers généraux de zone de défense.",
+      "Dispose de l'état-major des armées, dirigé par le major général des armées.",
+    ] },
+  { id: "o-sga04", t: "sga", q: "Présentez les fonctions stratégiques de la défense.",
+    pts: [
+      "Connaissance-compréhension-anticipation : renseignement et appréciation autonome de situation, condition de la décision.",
+      "Dissuasion : clé de voûte, protège des agressions d'origine étatique contre les intérêts vitaux.",
+      "Protection-résilience : défendre le territoire et la population, y compris face aux menaces hybrides.",
+      "Prévention : agir en amont des crises (prépositionnement, coopération).",
+      "Intervention : engager la force pour protéger nos ressortissants, défendre nos intérêts et honorer nos responsabilités internationales.",
+      "Influence : ajoutée par la Revue nationale stratégique 2022 — gagner la bataille des perceptions.",
+    ] },
+  { id: "o-sga05", t: "sga", q: "Quelles sont les missions des armées sur le territoire national ?",
+    pts: [
+      "Posture permanente de sûreté : surveillance et défense de l'espace aérien et des approches maritimes.",
+      "Protection : Vigipirate et l'opération Sentinelle en appui des forces de sécurité intérieure face à la menace terroriste.",
+      "Secours et service public : concours en cas de catastrophe naturelle ou technologique, secours en mer, pompiers militaires (BSPP à Paris, marins-pompiers à Marseille).",
+      "Santé publique : le service de santé des armées au profit de la Nation (hôpitaux d'instruction des armées).",
+      "Lutte contre les trafics illicites (Harpie en Guyane, action de l'État en mer).",
+      "Principe : la force militaire intervient en appui, complément ou secours des moyens civils quand ils sont insuffisants — cadre de la défense globale.",
+    ] },
+  { id: "o-sga06", t: "sga", q: "Décrivez l'organisation générale du ministère des Armées.",
+    pts: [
+      "Le ministre, responsable devant le Parlement, met en œuvre la politique de défense définie par le Président de la République en conseil de défense.",
+      "Trois grands piliers : l'EMA (préparation et emploi des forces, sous le CEMA), la DGA (équipement des forces, préparation de l'avenir industriel), le SGA (administration générale et soutien).",
+      "Les trois armées : Terre, Marine nationale, Air et Espace — plus les services interarmées (SSA, SEO, SCA, DIRISI... et le SID côté SGA).",
+      "Organismes rattachés : DGSE, DRSD, DGRIS, DICoD, contrôle général des armées.",
+      "Le SGA fédère les directions d'administration ; le SID lui est rattaché.",
+      "Bases de défense : échelon local de mutualisation du soutien — l'USID y est l'interlocuteur infrastructure.",
+    ] },
+  { id: "o-sga07", t: "sga", q: "Qu'est-ce que la politique immobilière du ministère et qui la porte ?",
+    pts: [
+      "Enjeu : gérer le plus vaste parc immobilier de l'État (27 %) au service de l'opérationnel, du cadre de vie et des finances publiques.",
+      "La DTIE définit la stratégie immobilière ministérielle, en cohérence avec la politique immobilière de l'État (DIE, SDIR).",
+      "Le SID est l'opérateur : il construit, maintient, administre le domaine, gère les actes (1 133 mises à disposition, ~130 prises à bail, cessions).",
+      "Priorités : hébergement et logement du personnel (plan famille), densification et cessions des emprises inutiles, performance énergétique.",
+      "Outils : schémas directeurs immobiliers d'emprise, programmation pluriannuelle, GTP pour la connaissance du patrimoine.",
+      "Lien avec les collectivités et la DIE pour les opérations domaniales.",
+    ] },
+
+  /* ---------- CULTURE MILITAIRE & LPM ---------- */
+  { id: "o-mil01", t: "mil", q: "Présentez la LPM 2024-2030.",
+    pts: [
+      "413 Mds€ de besoins programmés sur 7 ans ; effort de défense porté à 2 % du PIB dès 2025 ; doublement du budget annuel entre 2017 et 2030.",
+      "Conforter les fondamentaux : dissuasion (dont son infrastructure), postures permanentes, renseignement, forces spéciales, outre-mer, entraînement.",
+      "Adapter l'outil aux menaces : drones, défense sol-air, munitions (stocks et économie de guerre), maintien en condition opérationnelle.",
+      "Réussir les sauts technologiques : espace, cyber, IA, quantique, innovation.",
+      "Cohérence plutôt que masse : un modèle d'armée complet, apte à la haute intensité, en coalition.",
+      "Volet RH : fidélisation, réserve doublée (un réserviste pour deux d'active), transformation du ministère accompagnée par le SGA.",
+      "Pour le SID : construire, tenir le contrat opérationnel, maintenir — dans un contexte de durcissement.",
+    ] },
+  { id: "o-mil02", t: "mil", q: "Comment caractériseriez-vous le contexte stratégique actuel ?",
+    pts: [
+      "Retour du rapport de force entre États et de la guerre en Europe (Ukraine) : fin d'une forme de confort opérationnel.",
+      "Compétition offensive au quotidien dans tous les champs : cyber, spatial, informationnel, économique — menaces hybrides sous le seuil du conflit.",
+      "Changement d'échelle de la conflictualité : haute intensité, attrition, profondeur stratégique, économie de guerre.",
+      "Multiplication des foyers de crise (Indopacifique, Proche-Orient, Sahel) et remise en cause du multilatéralisme.",
+      "La France, puissance d'équilibres : nucléaire, membre permanent du CSNU, fondatrice de l'OTAN et de l'UE, présente sur tous les océans grâce aux outre-mer.",
+      "Conséquence : « gagner la guerre avant la guerre » — peser dès la compétition, être prêt à l'affrontement, en coalition.",
+    ] },
+  { id: "o-mil03", t: "mil", q: "Expliquez la formule « gagner la guerre avant la guerre ».",
+    pts: [
+      "Vision stratégique du général Burkhard (octobre 2021) : le monde vit un continuum compétition — contestation — affrontement.",
+      "La compétition est l'état normal : il faut y peser en permanence (influence, démonstrations de force, partenariats) pour dissuader l'escalade.",
+      "Être apte à l'affrontement de haute intensité rend crédible l'action dès la compétition : la préparation opérationnelle est un message stratégique.",
+      "Implique tous les champs : matériels et immatériels, et tous les acteurs — y compris les soutiens : une infrastructure disponible et résiliente participe de la crédibilité.",
+      "Prolongée par la Stratégie militaire générale (2023) qui organise l'adaptation permanente des armées.",
+    ] },
+  { id: "o-mil04", t: "mil", q: "Présentez la dissuasion nucléaire française.",
+    pts: [
+      "Clé de voûte de la défense : protéger les intérêts vitaux de la Nation contre toute agression d'origine étatique ; strictement défensive et en stricte suffisance.",
+      "Deux composantes complémentaires : océanique (4 SNLE basés à l'Île Longue, permanence à la mer depuis 1972) et aéroportée (Rafale, missile ASMPA, forces aériennes stratégiques et aéronavale).",
+      "Autonomie complète : conception (CEA/DAM), essais simulés, transmissions, chaîne de commandement sous l'autorité du Président de la République.",
+      "La LPM finance la modernisation : SNLE 3G, ASN4G, porte-avions de nouvelle génération.",
+      "Rôle majeur du SID : infrastructures de la dissuasion (Île Longue, bases aériennes à vocation nucléaire, futur PANG) — zoom « nucléaire » des chiffres clés.",
+      "Grands chantiers historiques : Île Longue 1966-1969, plus grand chantier d'Europe de l'époque.",
+    ] },
+  { id: "o-mil05", t: "mil", q: "Qu'est-ce que l'économie de guerre ?",
+    pts: [
+      "Produire plus, plus vite, dans la durée : adapter la BITD (~4 000 entreprises) à un conflit long et à l'attrition.",
+      "Leviers : visibilité des commandes, relocalisations, sécurisation des approvisionnements critiques, simplification des normes, stocks stratégiques.",
+      "Munitions : effort emblématique — plus de 2,4 Mds€ en 2026, montée en cadence (canons Caesar, obus, missiles), munitions téléopérées.",
+      "Implication des armées : exprimer des besoins standardisés, accepter le « suffisamment bon » plutôt que le sur-mesure long.",
+      "Volet infrastructure : le SID adapte dépôts de munitions, ateliers et emprises industrielles à cette montée en puissance.",
+      "S'inscrit dans la réactivité voulue par la LPM face au retour de la haute intensité.",
+    ] },
+  { id: "o-mil06", t: "mil", q: "La France et ses alliances : que dire de l'OTAN et de l'UE ?",
+    pts: [
+      "Le cadre normal d'engagement des armées françaises est la coalition — tout en préservant l'autonomie stratégique nationale (appréciation, décision, action).",
+      "OTAN : membre fondateur, pleinement engagée (posture de défense du flanc Est, présence en Roumanie où la France est nation-cadre — camp de Cincu étendu par le SID).",
+      "Union européenne : promotion d'une autonomie stratégique européenne ; boussole stratégique, facilité européenne pour la paix, coopérations capacitaires (SCAF, MGCS).",
+      "Partenariats stratégiques bilatéraux et régionaux (Indopacifique, Golfe, Afrique rénovée).",
+      "Le SID participe à des instances OTAN et UE dans son domaine (état-major de l'UE, centre d'excellence OTAN, Agence européenne de défense).",
+      "La dissuasion demeure strictement nationale mais contribue, par son existence, à la sécurité de l'Europe.",
+    ] },
+  { id: "o-mil07", t: "mil", q: "Parlez-moi du lien armées-Nation et de la réserve.",
+    pts: [
+      "Objectif LPM : doubler la réserve opérationnelle — un réserviste pour deux militaires d'active ; PLF 2026 : 52 000 contrats visés, modèle RH hybride active-réserve.",
+      "La réserve renforce la résilience et l'épaisseur des forces sur des segments critiques (cyber, santé, soutien).",
+      "Jeunesse : journée défense et citoyenneté, service militaire volontaire, SNU — politiques portées par la DSNJ du SGA.",
+      "Mémoire : DMCA, commémorations, monde combattant — ciment du lien armées-Nation.",
+      "Le personnel civil de la défense (64 000 agents) incarne aussi ce lien : un ICD sert la communauté de défense sans porter l'uniforme.",
+      "Enjeu de recrutement et de fidélisation : premier recruteur de l'État, ~30 000 recrutements par an.",
+    ] },
+  { id: "o-mil08", t: "mil", q: "Quelle est la trajectoire budgétaire de la défense depuis 2017 ?",
+    pts: [
+      "2017 : ~32 Mds€ ; remontée en puissance continue depuis, « réparation » par la LPM 2019-2025 puis transformation par la LPM 2024-2030.",
+      "2023 : 43,9 Mds€ ; 2024 : première marche de la LPM ; 2025 : +3,3 Mds€ conformément à la programmation.",
+      "2026 : accélération — +6,7 Mds€ par rapport à 2025, dont 3,5 Mds€ au-delà de la trajectoire initiale (annonce présidentielle du 13 juillet 2025).",
+      "2027 : ~64 Mds€, soit le doublement du budget de 2017.",
+      "Priorités des marches : munitions, MCO (6,5 Mds€ en 2026), équipements (~14 Mds€ de programmes en 2026, +30 %), renseignement, cyber, spatial, drones.",
+      "Argument d'oral : cette trajectoire finance directement le plan de charge infrastructure du SID.",
+    ] },
+
+  /* ---------- MAINTENANCE / USID ---------- */
+  { id: "o-usid01", t: "usid", q: "Présentez l'organisation et les missions d'une USID.",
+    pts: [
+      "Échelon de proximité de l'ESID au profit de la base de défense : assistance au commandement, gestion administrative du domaine, gestion technique du patrimoine, maîtrise de l'énergie, maintien en condition.",
+      "Organisation type (ESID de Bordeaux) : section assistance au commandement et soutien (SACS), section gestion du patrimoine (SGP : domaine, GTP, énergie), section ingénierie de la maintenance (SIM) avec ses antennes.",
+      "Les grosses USID (Bordeaux, Toulouse, Rochefort, Cazaux) ont en plus une section travaux (études-conception et travaux) ; antennes énergie et régies « aéro » pour les bases aériennes.",
+      "Concept USID NG : conduite d'opérations d'investissement de complexité faible à moyenne sur mandatement de la division Plan.",
+      "Le chef d'USID est le correspondant privilégié du COMBdD et des chefs de formation.",
+      "Relations formalisées par contrats de service avec la BdD ; peut intervenir hors de sa BdD selon le plan de charge.",
+    ] },
+  { id: "o-usid02", t: "usid", q: "Décrivez le dispositif de surveillance technique du patrimoine.",
+    pts: [
+      "Objet : connaître l'état du patrimoine (plus de 100 000 ouvrages, 4 200 terrains), déceler dangers et dégradations, évaluer la dangerosité pour l'occupant.",
+      "Surveillance périodique : contrôles et vérifications périodiques obligatoires (CVPO — électricité, levage, portes, SSI...), inspections périodiques élémentaires (patrimoine ordinaire et singulier), inspections périodiques approfondies.",
+      "Surveillance ponctuelle : inspections renforcées (événement, désordre) et inspections de fin de garantie avant l'expiration de la GPA.",
+      "Programmation par un plan quadriennal de surveillance technique ; exploitation des résultats pour prioriser la maintenance.",
+      "Acteurs du patrimoine : propriétaire-utilisateur, chef d'organisme, chef d'emprise, occupant, opérateur technique infrastructure (le SID).",
+      "Distinction : surveillance technique (état physique) ≠ surveillance administrative (occupation, servitudes) ≠ gardiennage (hors SID).",
+    ] },
+  { id: "o-usid03", t: "usid", q: "Expliquez le processus RCA / expression des besoins de maintenance.",
+    pts: [
+      "Cadre : instruction de 2012 et contrat de service BdD-USID ; directive annuelle conjointe DCSID-CICoS.",
+      "L'USID recense les besoins auprès des utilisateurs et bâtit l'expression de besoins (EDB) en crédits infra sur trois ans (A+1 à A+3), dans l'outil GTP v4.",
+      "Vérification du bon usage du petit entretien locatif (PEL/SPIRALE) avec charte cosignée SID-chef d'organisme et objectifs chiffrés.",
+      "La réunion de concertation annuelle (RCA) entre le commandant de BdD et l'USID valide et priorise les besoins ; clôture notifiée au CICoS.",
+      "Le bureau INFRA du CICoS répartit les enveloppes de maintien en condition entre BdD, avec échanges (visioconférences) pour fiabiliser le besoin.",
+      "Suivi de gestion : AE, EJ et CP suivis par croisement GTP / Chorus (Info-DAF) ; thématiques fléchées (ICPE, IOTA, installations industrialo-portuaires).",
+    ] },
+  { id: "o-usid04", t: "usid", q: "Distinguez les différents types de maintenance et de travaux au ministère.",
+    pts: [
+      "Maintenance préventive : programmée pour éviter la défaillance (contrôles, entretien courant, CVPO) — la surveillance technique en est le socle.",
+      "Maintenance corrective : dépannages et réparations — ~202 000 dépannages par an, 72 % résolus en moins de 25 jours.",
+      "Maintien en condition (MeC) : entretien courant financé sur les enveloppes BdD, programmé via la RCA ; travaux d'adaptation mineurs (TAM).",
+      "Maintenance lourde (MLI/MLO) : régénération d'ouvrages, opérations conduites par l'ESID ou l'USID sur mandatement.",
+      "Adaptation capacitaire (AC) : investissement pour répondre à un besoin nouveau (accueil d'un matériel, d'une unité).",
+      "Petit entretien locatif (PEL/SPIRALE) : menues réparations réalisées par l'occupant lui-même, encadrées par une charte.",
+    ] },
+  { id: "o-usid05", t: "usid", q: "Expliquez la chaîne financière d'une opération d'infrastructure.",
+    pts: [
+      "Cadre LOLF : programme 212 (SGA) pour l'essentiel de l'infrastructure ; budgets opérationnels de programme et unités opérationnelles.",
+      "AE : autorisations d'engagement — droit à engager juridiquement la dépense (notification des marchés).",
+      "EJ : engagement juridique dans Chorus, matérialisant le contrat ; CP : crédits de paiement pour payer les services faits de l'année.",
+      "Programmation : référentiel budgétaire, gestion prévisionnelle dans COSI/GTP, suivi de la consommation — responsabilité du chef de projets pour ses opérations.",
+      "Exécution de la dépense : service fait certifié, demandes de paiement, comptable public, délai global de 30 jours.",
+      "Enjeux : sincérité de la programmation, consommation des CP en fin de gestion, révisions de prix à anticiper (AE pluriannuelles).",
+    ] },
+  { id: "o-usid06", t: "usid", q: "Comment se passe le transfert d'un ouvrage neuf vers l'exploitant ?",
+    pts: [
+      "Anticipation dès la conception : associer l'USID et l'utilisateur aux choix d'exploitation-maintenance (accès, comptages, maintenabilité).",
+      "À la réception : remise des DOE (plans conformes, notices, PV d'essais) et du DIUO établi par le CSPS.",
+      "Prise en compte par l'USID : intégration au patrimoine (GTP), mise en place des contrats de maintenance et des CVPO, formation des exploitants.",
+      "Levée des réserves de réception suivie par la MOE ; l'entreprise reste tenue par la GPA pendant un an.",
+      "Inspection de fin de garantie avant l'échéance pour faire reprendre les désordres apparus.",
+      "Retour d'expérience vers la conduite d'opérations — un ouvrage bien transféré, c'est une maintenance maîtrisée pendant 50 ans.",
+    ] },
+  { id: "o-usid07", t: "usid", q: "Quelles relations une USID entretient-elle avec son environnement ?",
+    pts: [
+      "Avec le commandant de base de défense : correspondant privilégié, contrat de service, RCA annuelle, priorisation des crédits MeC.",
+      "Avec les formations soutenues : recueil des besoins (FEBu), conseil au commandement, suivi des emprises.",
+      "Au sein de l'ESID : division Plan (mandatements), division Investissement (opérations majeures), division Gestion du patrimoine, service achats, bureau expertise.",
+      "Avec les autres soutiens de la BdD : GSBdD, DIRISI (réseaux SIC), centre médical des armées.",
+      "Avec l'extérieur : direction immobilière de l'État, préfectures et collectivités (urbanisme, ICPE), concessionnaires.",
+      "En interne : antennes au plus près des emprises, astreinte pour les urgences infrastructure.",
+    ] },
+
+  /* ---------- STATUTS & RH ---------- */
+  { id: "o-rh01", t: "rh", q: "Présentez le corps des ingénieurs civils de la défense.",
+    pts: [
+      "Corps de catégorie A de la fonction publique de l'État, régi par le décret n° 89-750 du 18 octobre 1989 modifié.",
+      "Missions : encadrement, direction, expertise et étude dans les domaines scientifique, technique ou industriel ; possibilité de surveillance industrielle ; affectation au ministère des Armées et dans ses établissements publics.",
+      "Trois grades : ICD (10 échelons), ICD divisionnaire (9 échelons), ICD hors classe (5 échelons + échelon spécial, fonctions à responsabilité particulièrement élevée).",
+      "Recrutement par concours par spécialité : externe (diplôme de niveau 7), interne (3 ans de services publics), troisième concours (5 ans de mandats ou d'activités).",
+      "Promotion interne depuis les TSEF : liste d'aptitude (9 ans de services dont 5 dans le corps) ou examen professionnel (8 ans en catégorie B technique).",
+      "Avancement : ICDD au choix (4e échelon depuis 2 ans + 6 ans de services effectifs ; taux 2025 : 11 %).",
+    ] },
+  { id: "o-rh02", t: "rh", q: "Quels sont les droits et obligations des fonctionnaires ?",
+    pts: [
+      "Obligations : dignité, impartialité, intégrité et probité ; neutralité et laïcité ; secret professionnel et discrétion ; information du public ; obéissance hiérarchique (sauf ordre manifestement illégal ET de nature à compromettre gravement un intérêt public) ; obligation de servir et exclusivité.",
+      "Prévention des conflits d'intérêts : déport, déclarations d'intérêts pour certains emplois, référent déontologue, contrôle des départs vers le privé (HATVP).",
+      "Cumul d'activités : interdit par principe, dérogations encadrées (autorisation pour activités accessoires).",
+      "Droits : rémunération après service fait, protection fonctionnelle, droit syndical et droit de grève (encadrés), formation, congés, participation.",
+      "Non-discrimination et égalité professionnelle ; protection des lanceurs d'alerte.",
+      "Le tout codifié depuis 2022 dans le Code général de la fonction publique.",
+    ] },
+  { id: "o-rh03", t: "rh", q: "Présentez le statut des agents contractuels de l'État.",
+    pts: [
+      "Recrutés par dérogation au principe de l'occupation des emplois permanents par des fonctionnaires (loi 84-16, aujourd'hui CGFP) ; régime fixé par le décret n° 86-83 du 17 janvier 1986.",
+      "Cas de recours : absence de corps correspondant, nature des fonctions ou besoin du service (cat. A), remplacements, vacance temporaire, accroissement d'activité, temps incomplet.",
+      "Contrat de projet : CDD de 1 à 6 ans lié à une opération identifiée, sans droit à CDI au terme.",
+      "CDIsation : au terme de 6 ans de services publics sur fonctions de même catégorie auprès du même ministère, le renouvellement ne peut être qu'en CDI ; recrutement direct en CDI possible.",
+      "Garanties : entretien professionnel, formation, CCPU (instance paritaire), protection sociale ; rémunération fixée par référence aux grilles.",
+      "Voies vers la titularisation : concours interne (3 ans de services publics) — mon cas avec le concours ICD.",
+    ] },
+  { id: "o-rh04", t: "rh", q: "Décrivez le dispositif ministériel de lutte contre les harcèlements, violences sexuelles et discriminations.",
+    pts: [
+      "Politique de tolérance zéro, organisée en quatre axes : accompagnement des victimes, prévention, transparence, sanction des auteurs.",
+      "Cellule Thémis au sein du Contrôle général des armées (instruction n° 494/ARM/CAB du 24 octobre 2018) : saisissable hors hiérarchie par toute victime ou témoin — 09 88 68 55 55, themis@intradef.gouv.fr.",
+      "Ses moyens : écoute, orientation, enquêtes administratives propres, vérification des mesures de protection, suivi de la victime pendant 5 ans.",
+      "Rôle de la hiérarchie : recevoir la parole, comptes rendus écrits, signalement FL@SH EVENT, mesures conservatoires (suspension, mutation dans l'intérêt du service), action disciplinaire.",
+      "Appuis : Écoute défense (08 08 800 321, psychologues du SSA), services médicaux et sociaux, référents mixité ; article 40 CPP pour les faits pénaux.",
+      "Un cadre A doit connaître ce dispositif : il sera peut-être le premier à recevoir un signalement.",
+    ] },
+  { id: "o-rh05", t: "rh", q: "À quoi sert l'entretien professionnel et comment le conduire ?",
+    pts: [
+      "Individuel et annuel, conduit par le supérieur hiérarchique direct (N+1), pour fonctionnaires et contractuels ; c'est un droit de l'agent et une obligation du manager.",
+      "Contenu : bilan de l'année (atteinte des objectifs, difficultés, organisation), fixation des objectifs à venir, appréciation de la valeur professionnelle.",
+      "Volet formation : recensement des besoins au regard des objectifs et des perspectives (mobilité, préparation concours).",
+      "Formalisé par le CREP, notifié à l'agent ; il sert aux décisions RH (avancement, promotion, CIA).",
+      "Recours : demande de révision auprès de l'autorité hiérarchique (15 jours), saisine de la CAP ou de la CCP, recours de droit commun.",
+      "Bonnes pratiques : préparation des deux parties, faits objectivés, écoute, objectifs SMART — un moment de management, pas une formalité.",
+    ] },
+  { id: "o-rh06", t: "rh", q: "Présentez l'architecture de la fonction publique française.",
+    pts: [
+      "Trois versants : fonction publique de l'État (~2,2 M civils), territoriale et hospitalière — ~5,4 M d'agents au total.",
+      "Catégories hiérarchiques : A (conception, direction — dont les ICD), B (application, encadrement intermédiaire — TSEF), C (exécution).",
+      "Le fonctionnaire est dans une situation statutaire et réglementaire (pas contractuelle) : carrière, grade distinct de l'emploi, mobilité.",
+      "Cadre juridique unifié depuis 2022 : Code général de la fonction publique (ex-lois statutaires de 1983-84-86).",
+      "Spécificités défense : cohabitation civils/militaires, ouvriers de l'État (~22 % des civils du ministère), corps techniques propres (ICD, TSEF, IMI côté militaire).",
+      "Loi de transformation de la fonction publique (2019) : élargissement du recours au contrat, rupture conventionnelle, fusion des instances (CSA).",
+    ] },
+  { id: "o-rh07", t: "rh", q: "Pourquoi souhaitez-vous devenir fonctionnaire alors que vous êtes déjà contractuel ?",
+    pts: [
+      "Un engagement dans la durée : la titularisation traduit la volonté de servir l'État de façon pérenne, au-delà d'un CDD lié à un projet.",
+      "La carrière : grades et échelons, mobilité fonctionnelle et géographique au sein du ministère, perspectives d'encadrement supérieur (ICDD, HC).",
+      "La légitimité statutaire pour porter des responsabilités accrues : signer, représenter, encadrer.",
+      "La réciprocité des obligations : accepter pleinement les devoirs du statut (mobilité, neutralité, disponibilité) en échange de la protection qu'il offre.",
+      "La reconnaissance d'un parcours : le concours interne valorise l'expérience acquise en poste (AVP, marchés, conduite d'opérations).",
+      "À incarner avec sincérité : le jury cherche un projet professionnel construit, pas une simple recherche de sécurité.",
+    ] },
+
+  /* ---------- MANAGEMENT ---------- */
+  { id: "o-mgt01", t: "mgt", q: "Quel manager pensez-vous être ? Décrivez votre style.",
+    pts: [
+      "Structurer la réponse sur les cinq fonctions du référentiel : pilote-organisateur (cadrer, planifier, suivre), animateur (transversalité), contributeur, coach développeur de compétences, leader (sens et exemplarité).",
+      "Un style situationnel : directif quand l'urgence ou la sécurité l'exigent, délégatif avec les experts confirmés, accompagnant avec les nouveaux.",
+      "La confiance comme principe : cadre clair puis autonomie, contrôle proportionné, droit à l'erreur traité positivement.",
+      "S'appuyer sur du vécu : pilotage d'équipes projet (chargés de projets, BET, dessinateurs), coordination d'intervenants chantier.",
+      "Connaître ses points de vigilance et le dire (ex. exigence élevée à doser) : le jury valorise la lucidité sur soi.",
+      "Conclure sur la spécificité défense : manager des équipes mixtes civils/militaires, cultures professionnelles différentes.",
+    ] },
+  { id: "o-mgt02", t: "mgt", q: "Comment manager dans un environnement incertain (VICA) ?",
+    pts: [
+      "VICA : volatilité, incertitude, complexité, ambiguïté — le contexte normal du manager public aujourd'hui.",
+      "Face à l'incertitude : préférer l'expérimentation apprenante au renforcement des procédures et du contrôle ; la confiance en est le préalable.",
+      "Face à la complexité : coopérer et mobiliser l'intelligence collective — diversité des profils, co-construction, transversalité.",
+      "Face à l'ambiguïté : accepter de vivre avec plusieurs solutions possibles, gérer les paradoxes plutôt que les nier.",
+      "Donner des repères stables : sens (vision-mission-but), valeurs partagées, rituels d'équipe, communication régulière.",
+      "Développer l'agilité de l'équipe : montée en compétences, droit à l'erreur, retours d'expérience systématiques.",
+    ] },
+  { id: "o-mgt03", t: "mgt", q: "Comment motiver et fidéliser une équipe ?",
+    pts: [
+      "Identifier les sources de motivation propres à chacun : nécessité, plaisir du travail, reconnaissance, utilité sociale — puis adapter son management.",
+      "Donner du sens : relier le travail quotidien à la mission (ici : la capacité opérationnelle des forces et le cadre de vie des soldats).",
+      "Reconnaître : feedback positif régulier, valorisation des progrès, célébration des succès, convivialité et qualité de vie au travail.",
+      "Développer : identifier le potentiel de chacun, confier des projets responsabilisants, favoriser formation et transfert de compétences.",
+      "Traiter les irritants : déceler les sources de démotivation et d'échec, les traiter puis les prévenir.",
+      "Être un manager prévisible et équitable : tenir ses engagements, limiter la distance hiérarchique, protéger son équipe.",
+    ] },
+  { id: "o-mgt04", t: "mgt", q: "Un conflit éclate entre deux agents de votre section : que faites-vous ?",
+    pts: [
+      "Agir vite mais sans précipitation : ne pas laisser pourrir, ne pas trancher à chaud sur la foi d'une seule version.",
+      "Écouter séparément chaque protagoniste : faits, ressentis, attentes — écoute active, sans jugement.",
+      "Objectiver : distinguer le désaccord professionnel légitime du conflit de personnes ; vérifier s'il n'y a pas de faits relevant d'un autre registre (harcèlement → dispositif Thémis).",
+      "Réunir ensuite les parties pour une médiation : recentrer sur les faits et le travail, faire construire les solutions par les intéressés, acter des engagements.",
+      "Suivre dans la durée et recadrer si nécessaire ; solliciter appui RH, médecin de prévention ou médiateur si le conflit dépasse le niveau du service.",
+      "Prévenir : clarifier rôles et responsabilités, réguler la charge, entretenir la cohésion — beaucoup de conflits naissent d'organisations floues.",
+    ] },
+  { id: "o-mgt05", t: "mgt", q: "Comment accompagner votre équipe dans un changement (réorganisation, nouvel outil) ?",
+    pts: [
+      "Comprendre et incarner d'abord soi-même le changement : un manager qui doute à voix haute condamne le projet.",
+      "Donner le sens : pourquoi, pour quoi, ce qui change et ce qui ne change pas ; dire aussi ce qu'on ne sait pas encore.",
+      "Associer : co-construire les modalités locales, s'appuyer sur des relais volontaires, expérimenter avant de généraliser.",
+      "Accompagner la courbe du changement : accueillir les résistances comme des informations (pertes ressenties, compétences à acquérir), pas comme de la mauvaise volonté.",
+      "Former et sécuriser : plan de montée en compétences, tolérance temporaire de moindre performance, feedback rapproché.",
+      "Jalonner et valoriser les premiers succès ; rendre compte en transparence à sa hiérarchie des points durs.",
+    ] },
+  { id: "o-mgt06", t: "mgt", q: "Quelles spécificités à manager une équipe mixte civils / militaires ?",
+    pts: [
+      "Deux cultures professionnelles : rapport au temps, à la hiérarchie, à la mobilité (les militaires tournent tous les 3-4 ans) — richesse et source possible d'incompréhensions.",
+      "Faire émerger un socle commun : mission partagée (le soutien des forces), valeurs, rituels d'équipe ; l'esprit de contribution prime sur les logiques de statut.",
+      "Gérer la rotation militaire : capitaliser les savoirs (procédures, tuilage, documentation) pour absorber les départs.",
+      "Adapter sa posture : légitimité par la compétence et l'équité, pas par le statut ; connaître les cadres statutaires des uns et des autres.",
+      "Veiller à l'équité de traitement (primes, contraintes, télétravail) et à l'intégration des nouveaux arrivants.",
+      "Atout à valoriser : ton expérience quotidienne en ESID au contact d'IC, d'officiers et de personnels civils.",
+    ] },
+  { id: "o-mgt07", t: "mgt", q: "Comment donner un feedback, y compris difficile ?",
+    pts: [
+      "Structure : des faits observables, leurs effets concrets, puis les attentes ou pistes de solution — jamais de jugement sur la personne.",
+      "Le bon moment et le bon lieu : à chaud si possible, toujours en tête-à-tête pour un feedback correctif ; en public pour la reconnaissance.",
+      "Équilibrer dans la durée : un manager qui ne donne que du correctif démotive ; reconnaître les progrès crée la confiance qui rend le correctif audible.",
+      "Écouter la réponse : le feedback est un dialogue ; accepter d'être contredit par des faits.",
+      "Recadrage : nommer clairement l'écart à la règle, réaffirmer le cadre, fixer l'attendu et les conséquences, acter par écrit si répétition.",
+      "Demander aussi du feedback sur son propre management (à son équipe, à son N+1) : « manager son manager » fait partie du référentiel.",
+    ] },
+  { id: "o-mgt08", t: "mgt", q: "Vous prenez un poste d'encadrement : que faites-vous les 100 premiers jours ?",
+    pts: [
+      "Observer avant de réformer : rencontres individuelles avec chaque agent (missions, réussites, irritants, attentes), écoute des partenaires et de son N+1.",
+      "Comprendre le contexte : missions et indicateurs de l'entité, dossiers chauds, risques, histoire récente de l'équipe.",
+      "Clarifier le cadre : attentes réciproques, rituels (réunions, points individuels), circuits de décision et de délégation.",
+      "Sécuriser le courant : ne rien laisser tomber pendant la transition, traiter vite un ou deux irritants simples (victoires rapides).",
+      "Construire ensuite une feuille de route partagée : diagnostic restitué à l'équipe, priorités co-construites, objectifs à 6-12 mois.",
+      "Asseoir sa légitimité par la compétence, l'équité et la constance — pas par l'autorité statutaire.",
+    ] },
+];
+
+var QCM = [
+  /* ---- CP ---- */
+  { id: "m-cp01", t: "cp", q: "Le Code de la commande publique est entré en vigueur le…", opts: ["1er janvier 2016", "1er avril 2019", "1er janvier 2020", "1er avril 2021"], c: 1, e: "Il codifie ordonnances et décrets marchés publics et concessions." },
+  { id: "m-cp02", t: "cp", q: "La loi MOP date du…", opts: ["12 juillet 1985", "31 décembre 1975", "4 janvier 1978", "13 juillet 1991"], c: 0, e: "Loi n° 85-704, codifiée en 2019 dans le CCP." },
+  { id: "m-cp03", t: "cp", q: "Durée de la garantie de parfait achèvement ?", opts: ["6 mois", "1 an", "2 ans", "5 ans"], c: 1, e: "Un an à compter de la réception (art. 1792-6 C. civ.)." },
+  { id: "m-cp04", t: "cp", q: "La garantie biennale couvre…", opts: ["La solidité de l'ouvrage", "Les équipements dissociables", "Les désordres esthétiques", "Les études de conception"], c: 1, e: "Bon fonctionnement des éléments d'équipement dissociables (2 ans)." },
+  { id: "m-cp05", t: "cp", q: "Fondement de la garantie décennale ?", opts: ["Art. 1792 du Code civil", "Art. L2191 du CCP", "Loi Spinetta… de 1985", "CCAG Travaux art. 44"], c: 0, e: "Art. 1792 : responsabilité de plein droit des constructeurs (loi Spinetta 1978 pour l'assurance)." },
+  { id: "m-cp06", t: "cp", q: "Taux maximal de la retenue de garantie ?", opts: ["3 %", "5 %", "10 %", "15 %"], c: 1, e: "5 % du montant du marché, restituée à la fin de la GPA." },
+  { id: "m-cp07", t: "cp", q: "L'avance est obligatoire si le marché dépasse…", opts: ["25 000 € HT", "40 000 € HT", "50 000 € HT et 2 mois", "90 000 € HT"], c: 2, e: "Montant > 50 000 € HT et délai d'exécution > 2 mois ; minimum 5 %." },
+  { id: "m-cp08", t: "cp", q: "Seuil de paiement direct du sous-traitant ?", opts: ["600 €", "1 000 €", "5 000 €", "10 000 €"], c: 0, e: "Dès que sa part dépasse 600 € (loi du 31 décembre 1975)." },
+  { id: "m-cp09", t: "cp", q: "Délai global de paiement de l'État ?", opts: ["20 jours", "30 jours", "45 jours", "60 jours"], c: 1, e: "30 jours ; au-delà : intérêts moratoires + 40 € d'indemnité forfaitaire." },
+  { id: "m-cp10", t: "cp", q: "Seuil de dispense de publicité et mise en concurrence ?", opts: ["25 000 € HT", "40 000 € HT", "90 000 € HT", "215 000 € HT"], c: 1, e: "40 000 € HT (dérogation à 100 000 € HT pour les travaux)." },
+  { id: "m-cp11", t: "cp", q: "Qui prononce la réception des travaux ?", opts: ["Le maître d'œuvre", "Le maître d'ouvrage", "Le contrôleur technique", "L'entreprise"], c: 1, e: "Le MOA, sur proposition du MOE — point de départ des garanties." },
+  { id: "m-cp12", t: "cp", q: "Le coordonnateur SPS est obligatoire dès que…", opts: ["Le chantier dure 1 an", "2 entreprises interviennent", "Le montant dépasse 1 M€", "Il y a un ERP"], c: 1, e: "Dès qu'il y a coactivité de deux entreprises (y compris sous-traitants)." },
+  { id: "m-cp13", t: "cp", q: "Quelle pièce fixe les critères de jugement et leur pondération ?", opts: ["Le CCAP", "Le CCTP", "Le règlement de consultation", "L'acte d'engagement"], c: 2, e: "Le RC fixe les règles de la consultation ; le CCAP régit l'exécution." },
+  { id: "m-cp14", t: "cp", q: "En appel d'offres, la négociation est…", opts: ["Libre", "Possible avec accord du candidat", "Interdite", "Réservée aux PME"], c: 2, e: "L'AO exclut toute négociation ; seule une mise au point est possible." },
+  { id: "m-cp15", t: "cp", q: "DGD signifie…", opts: ["Décompte général définitif", "Dossier général de dévolution", "Décision de garantie décennale", "Décompte global des dépenses"], c: 0, e: "Il solde financièrement le marché après réception." },
+  { id: "m-cp16", t: "cp", q: "Face à un ordre de service qu'elle conteste, l'entreprise doit…", opts: ["Suspendre les travaux", "L'exécuter en émettant des réserves", "Saisir le juge", "Attendre un avenant"], c: 1, e: "Obligation d'exécution, réserves écrites pour préserver ses droits." },
+  { id: "m-cp17", t: "cp", q: "Modification « de minimis » en travaux : plafond ?", opts: ["5 %", "10 %", "15 %", "20 %"], c: 2, e: "15 % du montant initial en travaux (10 % en fournitures et services)." },
+  { id: "m-cp18", t: "cp", q: "Une offre anormalement basse doit être…", opts: ["Rejetée d'office", "Acceptée si conforme", "Justifiée par le candidat avant décision", "Renvoyée en négociation"], c: 2, e: "Demande écrite de justifications, puis rejet motivé si insuffisantes." },
+  { id: "m-cp19", t: "cp", q: "La DPGF est utilisée pour un marché à prix…", opts: ["Unitaires", "Forfaitaire", "Révisables uniquement", "Provisoires"], c: 1, e: "Décomposition du prix global et forfaitaire ; BPU/DQE pour les prix unitaires." },
+  { id: "m-cp20", t: "cp", q: "L'assurance dommages-ouvrage est souscrite par…", opts: ["L'entreprise", "Le maître d'œuvre", "Le maître d'ouvrage", "Le CSPS"], c: 2, e: "Elle préfinance les réparations décennales ; l'État en est dispensé." },
+  { id: "m-cp21", t: "cp", q: "Profil d'acheteur de l'État pour dématérialiser les marchés ?", opts: ["BOAMP", "PLACE", "Chorus Pro", "ALPHA"], c: 1, e: "PLACE = plateforme des achats de l'État ; Chorus Pro sert à la facturation." },
+  { id: "m-cp22", t: "cp", q: "Le standstill (délai de suspension avant signature) en procédure formalisée est de…", opts: ["5 jours", "11 jours", "16 jours", "30 jours"], c: 1, e: "11 jours minimum après notification électronique du rejet aux évincés." },
+
+  /* ---- SID ---- */
+  { id: "m-sid01", t: "sid", q: "Le SID a été créé en…", opts: ["1999", "2005", "2011", "2015"], c: 1, e: "Fusion des trois services constructeurs (Génie, Travaux maritimes, Air)." },
+  { id: "m-sid02", t: "sid", q: "Le SID est rattaché…", opts: ["À l'EMA", "À la DGA", "Au SGA", "Au cabinet du ministre"], c: 2, e: "Service interarmées rattaché au secrétariat général pour l'administration." },
+  { id: "m-sid03", t: "sid", q: "Combien d'ESID en métropole ?", opts: ["5", "6", "7", "9"], c: 2, e: "Bordeaux, Brest, Île-de-France, Lyon, Metz, Rennes, Toulon." },
+  { id: "m-sid04", t: "sid", q: "Combien d'USID environ ?", opts: ["20", "35", "50", "80"], c: 2, e: "Une cinquantaine, au contact des bases de défense." },
+  { id: "m-sid05", t: "sid", q: "Combien de DID outre-mer et à l'étranger ?", opts: ["5", "7", "9", "12"], c: 2, e: "Cayenne, Fort-de-France, Saint-Denis, Papeete, Nouméa, Djibouti, Abidjan, Dakar, Libreville." },
+  { id: "m-sid06", t: "sid", q: "L'ENSIM est implantée à…", opts: ["Versailles", "Angers", "Metz", "Brest"], c: 1, e: "École des ingénieurs militaires d'infrastructure, héritière de Mézières." },
+  { id: "m-sid07", t: "sid", q: "Le CETID a été créé en…", opts: ["2011", "2015", "2018", "2020"], c: 1, e: "Centre d'expertise des techniques d'infrastructure de la Défense." },
+  { id: "m-sid08", t: "sid", q: "Le CNPID est chargé de…", opts: ["La formation", "L'expertise technique", "La production d'ingénierie standardisée", "Le contrôle interne"], c: 2, e: "Créé en 2020 ; accords-cadres (~130 M€ d'EJ) au profit du réseau." },
+  { id: "m-sid09", t: "sid", q: "Part du domaine immobilier de l'État détenue par le ministère ?", opts: ["12 %", "27 %", "40 %", "55 %"], c: 1, e: "27 % du domaine immobilier ; 40 % correspond aux emprises foncières." },
+  { id: "m-sid10", t: "sid", q: "Effectifs du SID ?", opts: ["~3 500", "~5 000", "~6 700", "~9 000"], c: 2, e: "Dont deux tiers de civils ; 6 393 agents fin 2023." },
+  { id: "m-sid11", t: "sid", q: "Budget annuel du SID ?", opts: ["~1 Md€", "~2,5 Mds€", "~5 Mds€", "~8 Mds€"], c: 1, e: "≈ 2,6 Mds€ de contrats signés en 2023." },
+  { id: "m-sid12", t: "sid", q: "Directeur central du SID (cadrage 2024) ?", opts: ["IG Martine Huau", "IGHCA Alexandre Barouh", "GBR Olivier Mériau", "ICA Patrick Barrillon"], c: 1, e: "Martine Huau dirige l'ESID de Bordeaux." },
+  { id: "m-sid13", t: "sid", q: "ESID et USID ont été créés en…", opts: ["2005", "2008", "2011", "2014"], c: 2, e: "Maillage territorial au plus près des forces." },
+  { id: "m-sid14", t: "sid", q: "Les 3 engagements de la transformation du SID ?", opts: ["Unité, audace, expertise", "Performance, crédibilité, efficience", "Qualité, coûts, délais", "Servir, construire, durer"], c: 1, e: "Piliers du cadrage stratégique 2024." },
+  { id: "m-sid15", t: "sid", q: "Recrutements civils du SID en 2023 (année record) ?", opts: ["246", "350", "488", "700"], c: 2, e: "+16 % vs 2022, dont 246 contractuels ; 700 offres publiées." },
+  { id: "m-sid16", t: "sid", q: "Nombre de dépannages traités par an ?", opts: ["50 000", "100 000", "202 000", "500 000"], c: 2, e: "72 % résolus en moins de 25 jours." },
+  { id: "m-sid17", t: "sid", q: "L'académie de l'infrastructure sera implantée à…", opts: ["Paris", "Angers", "Bordeaux", "Rennes"], c: 1, e: "4 objectifs : former, tripler la capacité, modulariser, former à distance." },
+  { id: "m-sid18", t: "sid", q: "Quel chantier fut le plus grand d'Europe (1966-1969) ?", opts: ["La ligne Maginot", "L'Île Longue", "Le port de Brest", "Mururoa"], c: 1, e: "Base des SNLE, pour la force océanique stratégique voulue par de Gaulle." },
+
+  /* ---- SGA ---- */
+  { id: "m-sga01", t: "sga", q: "Effectifs du SGA ?", opts: ["5 000", "10 000", "15 000", "25 000"], c: 2, e: "Civils et militaires, en métropole, outre-mer et à l'étranger." },
+  { id: "m-sga02", t: "sga", q: "Que signifie DMCA ?", opts: ["Direction des moyens et de la commande achats", "Direction de la mémoire, de la culture et des archives", "Délégation ministérielle au contrôle des armées", "Direction du monde combattant et des associations"], c: 1, e: "Elle porte la politique mémorielle et culturelle du ministère." },
+  { id: "m-sga03", t: "sga", q: "Que signifie DTIE ?", opts: ["Direction du traitement de l'information et de l'énergie", "Direction des territoires, de l'immobilier et de l'environnement", "Direction technique des infrastructures essentielles", "Délégation aux travaux d'infrastructure de l'État"], c: 1, e: "Elle définit la politique immobilière ministérielle ; le SID en est l'opérateur." },
+  { id: "m-sga04", t: "sga", q: "Budget de la mission Défense en 2023 ?", opts: ["32 Mds€", "43,9 Mds€", "50,5 Mds€", "64 Mds€"], c: 1, e: "64 Mds€ est la cible 2027 ; ~55 Mds€ avec les pensions." },
+  { id: "m-sga05", t: "sga", q: "Nombre de logements du ministère ?", opts: ["12 000", "22 500", "34 340", "51 000"], c: 2, e: "Le ministère est le 1er bailleur foncier de l'État." },
+  { id: "m-sga06", t: "sga", q: "Surface foncière du ministère ?", opts: ["100 000 ha", "180 000 ha", "275 000 ha", "400 000 ha"], c: 2, e: "40 % des emprises foncières de l'État." },
+  { id: "m-sga07", t: "sga", q: "Fonction stratégique ajoutée par la RNS 2022 ?", opts: ["Résilience", "Influence", "Anticipation", "Cyberdéfense"], c: 1, e: "S'ajoute aux cinq fonctions historiques du Livre blanc." },
+  { id: "m-sga08", t: "sga", q: "Qui est le conseiller militaire du Gouvernement ?", opts: ["Le ministre des Armées", "Le CEMA", "Le DGA", "Le SGA"], c: 1, e: "Le chef d'état-major des armées, responsable de l'emploi des forces." },
+  { id: "m-sga09", t: "sga", q: "Le CEMA a autorité sur…", opts: ["La DGA", "Les chefs d'état-major des 3 armées", "Le SGA", "La DGSE"], c: 1, e: "Ainsi que sur les COMSUP outre-mer et les OGZD." },
+  { id: "m-sga10", t: "sga", q: "Effectifs civils du ministère des Armées ?", opts: ["~35 000", "~50 000", "~64 000", "~90 000"], c: 2, e: "5e ministère employeur civil ; 58 % de fonctionnaires." },
+  { id: "m-sga11", t: "sga", q: "Recrutements annuels du ministère (tous statuts) ?", opts: ["10 000", "18 000", "30 000", "45 000"], c: 2, e: "1er recruteur de l'État (~24 300 militaires, ~5 700 civils en 2023)." },
+  { id: "m-sga12", t: "sga", q: "Le secrétaire général pour l'administration en 2023 était…", opts: ["Jean-Paul Bodin", "Christophe Mauriet", "Alexandre Barouh", "Thierry Burkhard"], c: 1, e: "Le SGA est un haut fonctionnaire civil du ministère." },
+  { id: "m-sga13", t: "sga", q: "Les pompiers militaires protègent…", opts: ["Paris et Marseille", "Paris et Lyon", "Toutes les métropoles", "Les seules emprises militaires"], c: 0, e: "BSPP (armée de Terre) à Paris, bataillon de marins-pompiers à Marseille." },
+
+  /* ---- MIL ---- */
+  { id: "m-mil01", t: "mil", q: "Montant de la LPM 2024-2030 ?", opts: ["295 Mds€", "365 Mds€", "413 Mds€", "500 Mds€"], c: 2, e: "413 Mds€ de besoins programmés sur 7 ans." },
+  { id: "m-mil02", t: "mil", q: "L'effort de défense atteint 2 % du PIB à partir de…", opts: ["2024", "2025", "2027", "2030"], c: 1, e: "Engagement tenu dès la 2e annuité de la LPM." },
+  { id: "m-mil03", t: "mil", q: "La programmation militaire est votée par le Parlement depuis…", opts: ["1946", "1960", "1972", "1994"], c: 1, e: "Elle concrétise l'approbation par la Nation de l'effort de défense." },
+  { id: "m-mil04", t: "mil", q: "« Gagner la guerre avant la guerre » est la devise de…", opts: ["La RNS 2022", "La Vision stratégique du CEMA (2021)", "La LPM 2024-2030", "Le Livre blanc 2013"], c: 1, e: "Général Thierry Burkhard, octobre 2021." },
+  { id: "m-mil05", t: "mil", q: "Le triptyque stratégique du CEMA ?", opts: ["Paix – crise – guerre", "Compétition – contestation – affrontement", "Prévention – protection – intervention", "Dissuasion – défense – diplomatie"], c: 1, e: "La compétition est l'état normal du monde." },
+  { id: "m-mil06", t: "mil", q: "La Stratégie militaire générale date de…", opts: ["2021", "2022", "2023", "2025"], c: 2, e: "Septembre 2023 ; elle décline Vision et RNS en orientations." },
+  { id: "m-mil07", t: "mil", q: "Hausse du budget défense en 2026 ?", opts: ["+3,3 Mds€", "+4,2 Mds€", "+6,7 Mds€", "+10 Mds€"], c: 2, e: "Dont 3,5 Mds€ au-delà de la trajectoire LPM initiale." },
+  { id: "m-mil08", t: "mil", q: "Budget défense visé en 2027 ?", opts: ["50 Mds€", "57 Mds€", "64 Mds€", "70 Mds€"], c: 2, e: "Le double du budget de 2017 (discours du 13 juillet 2025)." },
+  { id: "m-mil09", t: "mil", q: "Lequel appartient au programme SCORPION ?", opts: ["VBCI", "Serval", "VAB", "AMX-10 RC"], c: 1, e: "SCORPION : Griffon, Serval, Jaguar (+ Leclerc rénové)." },
+  { id: "m-mil10", t: "mil", q: "Port d'attache des SNLE ?", opts: ["Toulon", "Cherbourg", "L'Île Longue (Brest)", "Lorient"], c: 2, e: "Permanence à la mer de la composante océanique depuis 1972." },
+  { id: "m-mil11", t: "mil", q: "Missile de la composante nucléaire aéroportée ?", opts: ["ASMPA", "M51", "Exocet", "Aster 30"], c: 0, e: "Emporté par Rafale ; le M51 arme les SNLE." },
+  { id: "m-mil12", t: "mil", q: "BITD signifie…", opts: ["Base interarmées des technologies de défense", "Base industrielle et technologique de défense", "Bureau des investissements techniques de défense", "Brigade d'intervention technique de défense"], c: 1, e: "~4 000 entreprises ; sa souveraineté fonde le modèle d'armée." },
+  { id: "m-mil13", t: "mil", q: "Cible de contrats de réserve (PLF 2026) ?", opts: ["25 000", "40 000", "52 000", "80 000"], c: 2, e: "Vers un réserviste pour deux militaires d'active." },
+  { id: "m-mil14", t: "mil", q: "Crédits munitions prévus en 2026 ?", opts: ["1,2 Md€", "1,9 Md€", "2,4 Mds€", "4 Mds€"], c: 2, e: "Stocks, munitions complexes et téléopérées — économie de guerre." },
+  { id: "m-mil15", t: "mil", q: "Où le SID a-t-il étendu un camp OTAN en Roumanie ?", opts: ["Constanța", "Cincu", "Sibiu", "Bucarest"], c: 1, e: "Accueil jusqu'à 2 000 personnes ; la France est nation-cadre." },
+
+  /* ---- USID ---- */
+  { id: "m-usid01", t: "usid", q: "CVPO signifie…", opts: ["Contrôles et vérifications périodiques obligatoires", "Commission de validation des projets d'ouvrages", "Cellule de veille du patrimoine opérationnel", "Contrats de vérification des prestations d'ouvrage"], c: 0, e: "Électricité, levage, portes, SSI… imposés par la réglementation." },
+  { id: "m-usid02", t: "usid", q: "Le plan de surveillance technique couvre…", opts: ["1 an", "2 ans", "4 ans", "10 ans"], c: 2, e: "Plan quadriennal de surveillance technique." },
+  { id: "m-usid03", t: "usid", q: "Le patrimoine du ministère compte environ…", opts: ["30 000 ouvrages", "60 000 ouvrages", "100 000 ouvrages", "250 000 ouvrages"], c: 2, e: "Répartis sur ~4 200 terrains, en France et à l'étranger." },
+  { id: "m-usid04", t: "usid", q: "RCA signifie…", opts: ["Revue des crédits annuels", "Réunion de concertation annuelle", "Recensement des capacités d'accueil", "Rapport de conduite d'affaires"], c: 1, e: "Entre la base de défense et l'USID, pour les besoins de maintenance." },
+  { id: "m-usid05", t: "usid", q: "L'expression des besoins (EDB) porte sur…", opts: ["L'année en cours", "2 ans", "3 ans", "7 ans"], c: 2, e: "A+1 à A+3, conduite dans l'outil GTP v4." },
+  { id: "m-usid06", t: "usid", q: "CICoS signifie…", opts: ["Centre interarmées de coordination du soutien", "Comité interministériel de coordination stratégique", "Cellule d'ingénierie et de conduite des soutiens", "Centre d'instruction du combat au sol"], c: 0, e: "Son bureau INFRA répartit les enveloppes MeC entre BdD." },
+  { id: "m-usid07", t: "usid", q: "PEL désigne…", opts: ["Le plan d'entretien lourd", "Le petit entretien locatif", "Le programme énergétique local", "Le patrimoine en location"], c: 1, e: "Réalisé par les occupants (dispositif SPIRALE), encadré par une charte." },
+  { id: "m-usid08", t: "usid", q: "Laquelle n'est PAS une section d'USID ?", opts: ["SACS", "SGP", "SIM", "SRH"], c: 3, e: "Assistance au commandement, gestion du patrimoine, ingénierie de la maintenance (+ STX)." },
+  { id: "m-usid09", t: "usid", q: "Quelle USID de l'ESID Bordeaux dispose d'une section travaux ?", opts: ["Pau", "Mont-de-Marsan", "Cazaux", "Angoulême"], c: 2, e: "Comme Bordeaux, Toulouse et Rochefort." },
+  { id: "m-usid10", t: "usid", q: "AE signifie…", opts: ["Avis d'exécution", "Autorisations d'engagement", "Attestation d'entreprise", "Avance exceptionnelle"], c: 1, e: "Droit à engager la dépense ; les CP servent à payer." },
+  { id: "m-usid11", t: "usid", q: "L'inspection de fin de garantie se fait…", opts: ["À la réception", "Avant la fin de la GPA", "Après 2 ans", "Tous les 4 ans"], c: 1, e: "Pour faire reprendre les désordres avant l'expiration de la garantie." },
+  { id: "m-usid12", t: "usid", q: "FEBu signifie…", opts: ["Fiche d'exécution budgétaire", "Fiche d'expression de besoin", "Formulaire d'évaluation bâtimentaire", "Fiche d'état des bâtiments utilisés"], c: 1, e: "Point d'entrée de la demande de l'utilisateur." },
+  { id: "m-usid13", t: "usid", q: "GTP est l'outil de…", opts: ["Gestion technique du patrimoine", "Gestion des travaux programmés", "Gouvernance des transferts patrimoniaux", "Gestion des titres de paiement"], c: 0, e: "SI support de l'EDB et de la programmation MeC (v4)." },
+  { id: "m-usid14", t: "usid", q: "Part des dépannages résolus en moins de 25 jours ?", opts: ["50 %", "60 %", "72 %", "90 %"], c: 2, e: "Sur ~202 000 dépannages annuels." },
+
+  /* ---- RH ---- */
+  { id: "m-rh01", t: "rh", q: "Le corps des ICD est régi par le décret…", opts: ["n° 86-83 du 17/01/1986", "n° 89-750 du 18/10/1989", "n° 2007-196 du 13/02/2007", "n° 2014-364 du 21/03/2014"], c: 1, e: "Décret du 18 octobre 1989 modifié — catégorie A." },
+  { id: "m-rh02", t: "rh", q: "Nombre d'échelons du grade d'ICD ?", opts: ["8", "9", "10", "12"], c: 2, e: "ICDD : 9 échelons ; ICD-HC : 5 + un échelon spécial." },
+  { id: "m-rh03", t: "rh", q: "Diplôme requis au concours externe ICD ?", opts: ["Niveau 5 (bac+2)", "Niveau 6 (bac+3)", "Niveau 7 (bac+5)", "Niveau 8 (doctorat)"], c: 2, e: "Dans le domaine de la spécialité, ou équivalence (décret 2007-196)." },
+  { id: "m-rh04", t: "rh", q: "Ancienneté requise au concours interne ?", opts: ["1 an", "3 ans", "4 ans", "5 ans"], c: 1, e: "3 ans de services publics au 1er janvier de l'année du concours." },
+  { id: "m-rh05", t: "rh", q: "Taux de promotion ICDD en 2025 ?", opts: ["7 %", "9 %", "11 %", "15 %"], c: 2, e: "Promotion au choix par tableau d'avancement annuel." },
+  { id: "m-rh06", t: "rh", q: "Conditions pour être promouvable ICDD ?", opts: ["6e échelon + 4 ans", "4e échelon depuis 2 ans + 6 ans de services", "10 ans de services", "Examen professionnel"], c: 1, e: "4e échelon depuis au moins 2 ans et 6 ans de services effectifs dans le grade." },
+  { id: "m-rh07", t: "rh", q: "Le décret applicable aux contractuels de l'État est le…", opts: ["86-83 du 17 janvier 1986", "89-750 du 18 octobre 1989", "49-1378 de 1949", "2019-1414"], c: 0, e: "Pris pour l'application de la loi 84-16, aujourd'hui codifiée au CGFP." },
+  { id: "m-rh08", t: "rh", q: "Durée de services ouvrant droit au CDI ?", opts: ["3 ans", "4 ans", "6 ans", "9 ans"], c: 2, e: "6 ans sur fonctions de même catégorie auprès du même ministère." },
+  { id: "m-rh09", t: "rh", q: "Durée maximale d'un contrat de projet ?", opts: ["3 ans", "5 ans", "6 ans", "Illimitée"], c: 2, e: "De 1 à 6 ans, lié à la réalisation de l'opération ; pas de CDI au terme." },
+  { id: "m-rh10", t: "rh", q: "La cellule Thémis relève…", opts: ["De la DRH-MD", "Du contrôle général des armées", "De la DAJ", "Du cabinet du ministre"], c: 1, e: "Instruction n° 494/ARM/CAB du 24 octobre 2018 ; saisissable hors hiérarchie." },
+  { id: "m-rh11", t: "rh", q: "Numéro de la cellule Thémis ?", opts: ["09 88 68 55 55", "08 08 800 321", "116 006", "3919"], c: 0, e: "08 08 800 321 = Écoute défense (psychologues du SSA)." },
+  { id: "m-rh12", t: "rh", q: "Combien d'axes structurent la lutte contre les HVS-D ?", opts: ["2", "3", "4", "5"], c: 2, e: "Accompagnement, prévention, transparence, sanction." },
+  { id: "m-rh13", t: "rh", q: "L'entretien professionnel est conduit par…", opts: ["Le chef d'établissement", "Le N+1", "La DRH", "Un jury"], c: 1, e: "Annuel, formalisé par le CREP, avec voies de recours." },
+  { id: "m-rh14", t: "rh", q: "Part des ouvriers de l'État parmi les civils du ministère ?", opts: ["8 %", "15 %", "22 %", "35 %"], c: 2, e: "58 % de fonctionnaires, ~17 % de contractuels (2021)." },
+  { id: "m-rh15", t: "rh", q: "Un fonctionnaire peut désobéir si l'ordre est…", opts: ["Contraire à son intérêt", "Manifestement illégal ET compromet gravement un intérêt public", "Donné oralement", "Hors fiche de poste"], c: 1, e: "Les deux conditions sont cumulatives (jurisprudence Langneur)." },
+
+  /* ---- MGT ---- */
+  { id: "m-mgt01", t: "mgt", q: "VICA signifie…", opts: ["Vision, initiative, cohésion, autorité", "Volatilité, incertitude, complexité, ambiguïté", "Valeurs, innovation, confiance, agilité", "Veille, information, coordination, action"], c: 1, e: "L'environnement qui impose l'agilité managériale." },
+  { id: "m-mgt02", t: "mgt", q: "Laquelle n'est PAS une fonction du manager du référentiel ?", opts: ["Pilote-organisateur", "Animateur", "Contrôleur", "Leader"], c: 2, e: "Les 5 fonctions : pilote-organisateur, animateur, contributeur, coach développeur, leader." },
+  { id: "m-mgt03", t: "mgt", q: "Un feedback constructif s'appuie d'abord sur…", opts: ["Le ressenti du manager", "Des faits observables", "La personnalité de l'agent", "Les résultats des autres"], c: 1, e: "Faits → effets → attentes ; jamais de jugement de personne." },
+  { id: "m-mgt04", t: "mgt", q: "Un recadrage se fait…", opts: ["En réunion d'équipe", "Par écrit uniquement", "En tête-à-tête, sur des faits", "Par le N+2"], c: 2, e: "Rapide, privé, factuel — la reconnaissance peut être publique." },
+  { id: "m-mgt05", t: "mgt", q: "Face à l'incertitude, le référentiel recommande…", opts: ["Renforcer les procédures", "Multiplier les contrôles", "L'expérimentation fondée sur la confiance", "Centraliser les décisions"], c: 2, e: "La confiance est le préalable de l'agilité." },
+  { id: "m-mgt06", t: "mgt", q: "Bien déléguer, c'est confier…", opts: ["La tâche seule", "Un objectif, des moyens et un suivi", "La responsabilité sans les moyens", "Le travail aux plus disponibles"], c: 1, e: "Déléguer n'est ni abandonner ni micro-manager." },
+  { id: "m-mgt07", t: "mgt", q: "« Faire plus avec moins » illustre…", opts: ["Un objectif SMART", "Une injonction paradoxale", "Un levier de motivation", "Une délégation"], c: 1, e: "À gérer par priorisation explicite et arbitrages assumés." },
+  { id: "m-mgt08", t: "mgt", q: "Les « questions puissantes » sont…", opts: ["Des questions fermées de contrôle", "Des questions ouvertes qui font réfléchir", "Des questions pièges", "Des sondages anonymes"], c: 1, e: "Outil du manager-coach pour développer l'autonomie." },
+  { id: "m-mgt09", t: "mgt", q: "« Manager son manager » signifie…", opts: ["Contester ses décisions", "Clarifier besoins mutuels et modalités de collaboration", "Le court-circuiter", "Le remplacer en son absence"], c: 1, e: "Rendre compte, faire remonter, demander un cap quand il manque." },
+  { id: "m-mgt10", t: "mgt", q: "Le manager « développeur de compétences »…", opts: ["Forme lui-même à tout", "Identifie les potentiels et fait grandir", "Recrute des experts", "Évalue en fin d'année"], c: 1, e: "Entretiens dédiés, projets responsabilisants, transferts de savoirs." },
+];
+
+var MODES = {
+  open: { key:"open", label:"Oral", full:"Questions ouvertes", bank:OPEN },
+  qcm:  { key:"qcm",  label:"QCM",  full:"QCM \u00e9clair",     bank:QCM  }
+};
+var SKEY = "memento-icd-stats-v2";
+var S = {
+  mode:"open", screen:"home", stats:{}, deck:[], deckLabel:"", deckMode:"open",
+  idx:0, revealed:false, picked:null, optOrder:[], sessionOk:0, sessionKo:[]
+};
+try { S.stats = JSON.parse(localStorage.getItem(SKEY) || "{}"); } catch(e){ S.stats = {}; }
+
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(S.stats)); }catch(e){} }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function theme(id){ for(var i=0;i<THEMES.length;i++) if(THEMES[i].id===id) return THEMES[i]; }
+function bank(){ return MODES[S.mode].bank; }
+function mastered(b){ var n=0; b.forEach(function(q){ if(S.stats[q.id] && S.stats[q.id].lastOk===true) n++; }); return n; }
+function reviewPool(b){ return b.filter(function(q){ return S.stats[q.id] && S.stats[q.id].lastOk===false; }); }
+
+function startSession(qs,label){
+  if(!qs.length) return;
+  S.deck = shuffle(qs); S.deckLabel = label; S.deckMode = S.mode;
+  S.idx = 0; S.revealed = false; S.picked = null;
+  S.optOrder = S.deck[0].opts ? shuffle([0,1,2,3]) : [];
+  S.sessionOk = 0; S.sessionKo = [];
+  S.screen = "quiz"; render(); window.scrollTo(0,0);
+}
+function record(q,ok){
+  var p = S.stats[q.id] || {ok:0,ko:0,lastOk:null};
+  S.stats[q.id] = {ok:p.ok+(ok?1:0), ko:p.ko+(ok?0:1), lastOk:ok};
+  save();
+}
+function advance(ok,q){
+  if(ok) S.sessionOk++; else S.sessionKo.push(q);
+  if(S.idx+1 >= S.deck.length){ S.screen="end"; render(); window.scrollTo(0,0); return; }
+  S.idx++; S.revealed=false; S.picked=null;
+  var nq = S.deck[S.idx];
+  S.optOrder = nq.opts ? shuffle([0,1,2,3]) : [];
+  render(); window.scrollTo(0,0);
+}
+function gradeOpen(ok){ var q=S.deck[S.idx]; record(q,ok); advance(ok,q); }
+function pickOption(ri){
+  if(S.picked!==null) return;
+  var q=S.deck[S.idx]; S.picked=ri; record(q, ri===q.c); render();
+}
+function nextQcm(){ var q=S.deck[S.idx]; advance(S.picked===q.c, q); }
+function resetProgress(){
+  if(!confirm("Effacer toute la progression enregistr\u00e9e (oral + QCM) ?")) return;
+  S.stats={}; save(); render();
+}
+function setMode(m){ S.mode=m; render(); }
+function goHome(){ S.screen="home"; render(); window.scrollTo(0,0); }
+
+function headHtml(){
+  return '<header class="head"><div class="head-rule"></div>' +
+    '<div class="head-eyebrow">R\u00c9PUBLIQUE FRAN\u00c7AISE \u2014 MINIST\u00c8RE DES ARM\u00c9ES</div>' +
+    '<h1 class="head-title">M\u00c9MENTO&nbsp;ICD</h1>' +
+    '<div class="head-sub">Entra\u00eenement oral \u00b7 concours ing\u00e9nieur civil de la d\u00e9fense \u00b7 sp\u00e9cialit\u00e9 BTP</div>' +
+    '<div class="head-rule"></div></header>';
+}
+
+function homeHtml(){
+  var b = bank(), m = mastered(b), rp = reviewPool(b);
+  var h = '<main>';
+  h += '<div class="mode-switch">';
+  ["open","qcm"].forEach(function(k){
+    var M = MODES[k];
+    h += '<button class="mode-tab'+(S.mode===k?' on':'')+'" onclick="setMode(\''+k+'\')">'+M.full+
+         '<span class="mode-count">'+M.bank.length+' questions</span></button>';
+  });
+  h += '</div>';
+  h += '<div class="mode-hint">'+(S.mode==="open"
+      ? "R\u00e9ponds \u00e0 voix haute comme devant le jury, puis compare aux \u00e9l\u00e9ments de r\u00e9ponse d\u00e9taill\u00e9s."
+      : "R\u00e9ponse courte, correction imm\u00e9diate : id\u00e9al pour ancrer les chiffres, dates et sigles.")+'</div>';
+  h += '<div class="scorebar"><div class="scorebar-num">'+m+'<span> / '+b.length+'</span></div>'+
+       '<div class="scorebar-label">questions acquises \u2014 mode '+MODES[S.mode].label+'</div>'+
+       '<div class="scorebar-track"><div class="scorebar-fill" style="width:'+(m/b.length*100)+'%"></div></div></div>';
+  h += '<button class="btn-main" onclick="startFull()">'+
+       (S.mode==="open"?"Lancer un oral blanc":"Lancer un QCM complet")+
+       '<span class="btn-main-count">'+b.length+' questions, ordre al\u00e9atoire</span></button>';
+  if(rp.length) h += '<button class="btn-review" onclick="startReview()">Revoir mes lacunes'+
+       '<span class="btn-main-count">'+rp.length+' question'+(rp.length>1?'s':'')+' \u00e0 retravailler</span></button>';
+  h += '<div class="theme-caption">R\u00e9viser par th\u00e9matique</div><div class="themes">';
+  THEMES.forEach(function(t){
+    var qs = b.filter(function(q){return q.t===t.id;});
+    var done = mastered(qs);
+    h += '<button class="theme-row" onclick="startTheme(\''+t.id+'\')">'+
+      '<span class="theme-spine" style="background:'+t.color+'"></span>'+
+      '<span class="theme-body"><span class="theme-name">'+esc(t.name)+'</span>'+
+      '<span class="theme-meta">'+done+' / '+qs.length+' acquises</span>'+
+      '<span class="theme-track"><span class="theme-fill" style="width:'+(qs.length?done/qs.length*100:0)+'%;background:'+t.color+'"></span></span></span>'+
+      '<span class="theme-go">\u203a</span></button>';
+  });
+  h += '</div><button class="btn-reset" onclick="resetProgress()">R\u00e9initialiser la progression</button></main>';
+  return h;
+}
+function startFull(){ startSession(bank(), MODES[S.mode].full+" \u2014 toutes th\u00e9matiques"); }
+function startReview(){ startSession(reviewPool(bank()), "S\u00e9ance de rattrapage"); }
+function startTheme(id){ startSession(bank().filter(function(q){return q.t===id;}), theme(id).name); }
+function replayKo(){ S.mode=S.deckMode; startSession(S.sessionKo.slice(), "Rattrapage imm\u00e9diat"); }
+function replayDeck(){ S.mode=S.deckMode; startSession(S.deck.slice(), S.deckLabel); }
+function reveal(){ S.revealed=true; render(); }
+
+function quizHtml(){
+  var q = S.deck[S.idx], t = theme(q.t);
+  var h = '<main>';
+  h += '<div class="quiz-top"><button class="btn-quit" onclick="goHome()">\u2039 Quitter</button>'+
+       '<div class="quiz-label">'+esc(S.deckLabel)+'</div></div>';
+  h += '<div class="quiz-progress"><div class="quiz-progress-fill" style="width:'+(S.idx/S.deck.length*100)+'%"></div></div>';
+  h += '<div class="quiz-counter">Question '+(S.idx+1)+' / '+S.deck.length+' \u2014 mode '+MODES[S.deckMode].label+'</div>';
+  h += '<section class="card"><div class="card-spine" style="background:'+t.color+'"></div><div class="card-inner">';
+  h += '<div class="card-theme" style="color:'+t.color+'">'+esc(t.short)+'</div>';
+  h += '<div class="card-q">'+esc(q.q)+'</div>';
+
+  if(S.deckMode==="qcm"){
+    h += '<div class="opts">';
+    S.optOrder.forEach(function(ri){
+      var cls = "opt";
+      if(S.picked!==null){
+        if(ri===q.c) cls += " good";
+        else if(ri===S.picked) cls += " bad";
+        else cls += " dim";
+      }
+      h += '<button class="'+cls+'" '+(S.picked!==null?'disabled':'')+' onclick="pickOption('+ri+')">'+esc(q.opts[ri])+'</button>';
+    });
+    if(S.picked!==null){
+      h += '<div class="qcm-verdict"><div class="stamp'+(S.picked===q.c?' stamp-ok':'')+'">'+
+           (S.picked===q.c?'EXACT':'FAUX')+'</div>'+
+           (q.e?'<div class="answer-detail">'+esc(q.e)+'</div>':'')+'</div>';
+    }
+    h += '</div>';
+  } else {
+    if(!S.revealed){
+      h += '<button class="btn-reveal" onclick="reveal()">Voir les \u00e9l\u00e9ments de r\u00e9ponse</button>';
+    } else {
+      h += '<div class="answer"><div class="stamp">\u00c9L\u00c9MENTS DE R\u00c9PONSE</div><ul class="pts">';
+      q.pts.forEach(function(p){ h += '<li>'+esc(p)+'</li>'; });
+      h += '</ul>'+(q.plus?'<div class="answer-detail">\u2192 '+esc(q.plus)+'</div>':'')+'</div>';
+    }
+  }
+  h += '</div></section>';
+
+  if(S.deckMode==="open" && S.revealed){
+    h += '<div class="grade"><button class="btn-ko" onclick="gradeOpen(false)">\u2717&nbsp; \u00c0 revoir</button>'+
+         '<button class="btn-ok" onclick="gradeOpen(true)">\u2713&nbsp; Ma\u00eetris\u00e9</button></div>';
+  }
+  if(S.deckMode==="qcm" && S.picked!==null){
+    h += '<div class="grade"><button class="btn-next" onclick="nextQcm()">Question suivante \u203a</button></div>';
+  }
+  h += '</main>';
+  return h;
+}
+
+function endHtml(){
+  var n = S.deck.length, ok = S.sessionOk;
+  var verdict = ok===n ? "Sans faute. Le jury n'a qu'\u00e0 bien se tenir."
+    : ok/n>=0.7 ? "Solide. Consolide les derni\u00e8res lacunes et c'est bon."
+    : "Bonne base de travail : les questions rat\u00e9es sont m\u00e9moris\u00e9es pour le rattrapage.";
+  var h = '<main class="end">';
+  h += '<div class="end-eyebrow">Fin de s\u00e9ance \u2014 '+esc(S.deckLabel)+'</div>';
+  h += '<div class="end-score">'+ok+'<span> / '+n+'</span></div>';
+  h += '<div class="end-verdict">'+verdict+'</div>';
+  if(S.sessionKo.length){
+    h += '<div class="end-ko-caption">\u00c0 retravailler ('+S.sessionKo.length+')</div><ul class="end-ko-list">';
+    S.sessionKo.forEach(function(q){
+      h += '<li><span style="color:'+theme(q.t).color+'">\u25a0</span> '+esc(q.q)+'</li>';
+    });
+    h += '</ul><button class="btn-main" onclick="replayKo()">Rejouer les questions rat\u00e9es</button>';
+  }
+  h += '<button class="btn-secondary" onclick="replayDeck()">Refaire la s\u00e9ance</button>';
+  h += '<button class="btn-secondary" onclick="goHome()">Retour \u00e0 l\u2019accueil</button></main>';
+  return h;
+}
+
+function render(){
+  var h = headHtml();
+  if(S.screen==="home") h += homeHtml();
+  else if(S.screen==="quiz" && S.deck[S.idx]) h += quizHtml();
+  else h += endHtml();
+  h += '<footer class="foot">'+OPEN.length+' questions ouvertes \u00b7 '+QCM.length+' QCM \u2014 banque \u00e9tablie \u00e0 partir de tes dossiers Drive \u00ab ICD \u00bb.</footer>';
+  document.getElementById("app").innerHTML = h;
+}
+render();
+</script>
+</body>
+</html>
